@@ -1,65 +1,69 @@
-import Image from "next/image";
+"use client";
+import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.js file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="pt-20">
+      {/* 1. SWIPEABLE BANNER (Simplified Logic) */}
+      <section className="relative h-[85vh] bg-kate-cream overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center bg-[url('https://images.unsplash.com/photo-1621452973707-639662783c8c?auto=format&fit=crop&q=80')] bg-cover bg-center">
+          <div className="absolute inset-0 bg-black/20" />
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative text-center text-white"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <h1 className="text-7xl md:text-9xl font-serif mb-6">SS/2026</h1>
+            <p className="text-xl tracking-[0.3em] uppercase mb-8">The Little Duchess Collection</p>
+            <Link href="/products" className="bg-white text-kate-dark px-10 py-4 rounded-full font-bold hover:bg-kate-dark hover:text-white transition-all">
+              SHOP COLLECTION
+            </Link>
+          </motion.div>
         </div>
-      </main>
+      </section>
+
+      {/* 2. LATEST PRODUCT CARD */}
+      <section className="py-20 px-6 max-w-7xl mx-auto">
+        <h2 className="text-3xl font-serif text-kate-dark mb-12">Latest Arrivals</h2>
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="bg-white p-6 rounded-3xl flex flex-col md:flex-row items-center gap-8 shadow-sm border border-gray-100">
+            <div className="w-full md:w-1/2 h-80 bg-gray-200 rounded-2xl overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?auto=format&fit=crop&q=80" className="w-full h-full object-cover" />
+            </div>
+            <div className="space-y-4">
+              <h3 className="text-2xl font-bold">Silk Petal Dress</h3>
+              <p className="text-gray-600 italic">Hand-stitched silk with 100% cotton lining for maximum comfort.</p>
+              <button className="bg-kate-dark text-white px-6 py-2 rounded-full text-sm">Shop Now</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. BRAND VIDEO */}
+      <section className="h-[60vh] relative mb-20">
+        <video autoPlay loop muted className="w-full h-full object-cover grayscale-[30%]">
+          <source src="https://assets.mixkit.co/videos/preview/mixkit-little-girl-playing-in-a-field-of-flowers-42861-large.mp4" />
+        </video>
+        <div className="absolute inset-0 bg-kate-dark/30 flex items-center justify-center">
+          <h2 className="text-white text-5xl font-serif italic">Pure Elegance, Pure KATE.</h2>
+        </div>
+      </section>
+
+      {/* 4. HAPPY CUSTOMERS MASONRY GRID */}
+      <section className="py-20 px-6 max-w-7xl mx-auto">
+        <h2 className="text-3xl font-serif text-center mb-12">#KATEGirls Around The World</h2>
+        <div className="columns-2 md:columns-4 gap-4 space-y-4">
+          {[1,2,3,4,5,6].map((i) => (
+            <motion.div whileHover={{ scale: 1.02 }} key={i} className="rounded-xl overflow-hidden shadow-lg">
+              <img src={`https://images.unsplash.com/photo-1519238263530-99bbe1122da2?q=80&w=400&auto=format&fit=crop`} alt="Customer" className="w-full" />
+            </motion.div>
+          ))}
+        </div>
+        <div className="text-center mt-12">
+           <button className="border-2 border-kate-dark px-8 py-3 rounded-full font-bold hover:bg-kate-dark hover:text-white transition">LOAD MORE</button>
+        </div>
+      </section>
     </div>
   );
 }
