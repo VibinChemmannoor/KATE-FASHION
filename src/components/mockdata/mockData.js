@@ -1,0 +1,96 @@
+export const MOCK_PRODUCTS = [
+  {
+    id: 1,
+    name: "Silk Petal Dress",
+    modelName: "Summer Collection",
+    price: 120,
+    oldPrice: 156,
+    discount: 23,
+    img1: "https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?auto=format&fit=crop&q=80",
+    img2: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80",
+    img3: "https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?auto=format&fit=crop&q=80"
+  },
+  {
+    id: 2,
+    name: "Velvet Bow Romper",
+    modelName: "Winter Gala",
+    price: 85,
+    oldPrice: 110,
+    discount: 22,
+    img1: "https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&q=80",
+    img2: "https://images.unsplash.com/photo-1621452973707-639662783c8c?auto=format&fit=crop&q=80",
+    img3: "https://images.unsplash.com/photo-1606456041040-7e6d24a7374b?auto=format&fit=crop&q=80"
+  },
+   {
+    id: 3,
+    name: "Rainbow Bow Romper",
+    modelName: "Winter martin",
+    price: 85,
+    oldPrice: 110,
+    discount: 22,
+    img1: "https://e0.pxfuel.com/wallpapers/474/691/desktop-wallpaper-cute-baby-girl-small-cute-girls.jpg",
+    img2: "https://images.unsplash.com/photo-1621452973707-639662783c8c?auto=format&fit=crop&q=80",
+    img3: "https://images.unsplash.com/photo-1606456041040-7e6d24a7374b?auto=format&fit=crop&q=80"
+  },
+   {
+    id: 4,
+    name: "Cmerin color",
+    modelName: "summer Gala",
+    price: 85,
+    oldPrice: 110,
+    discount: 22,
+    img1: "https://i.pinimg.com/originals/1c/48/c1/1c48c1aaeb2e6e0195630ce694a717e7.jpg",
+    img2: "https://images.unsplash.com/photo-1621452973707-639662783c8c?auto=format&fit=crop&q=80",
+    img3: "https://images.unsplash.com/photo-1606456041040-7e6d24a7374b?auto=format&fit=crop&q=80"
+  },
+   {
+    id: 5,
+    name: "Ruella book",
+    modelName: "summer Gala",
+    price: 85,
+    oldPrice: 110,
+    discount: 22,
+    img1: "https://cdn.wallpapersafari.com/56/68/RuUXAy.jpg",
+    img2: "https://images.unsplash.com/photo-1621452973707-639662783c8c?auto=format&fit=crop&q=80",
+    img3: "https://images.unsplash.com/photo-1606456041040-7e6d24a7374b?auto=format&fit=crop&q=80"
+  },
+   {
+    id: 6,
+    name: "Montariss  hola",
+    modelName: "summer Gala",
+    price: 85,
+    oldPrice: 110,
+    discount: 22,
+    img1: "https://i.pinimg.com/236x/c0/07/5e/c0075ebc95fc4bf1eba13219b09115ae.jpg",
+    img2: "https://images.unsplash.com/photo-1621452973707-639662783c8c?auto=format&fit=crop&q=80",
+    img3: "https://images.unsplash.com/photo-1606456041040-7e6d24a7374b?auto=format&fit=crop&q=80"
+  },
+   {
+    id: 7,
+    name: "melia lava",
+    modelName: "Winter martin",
+    price: 85,
+    oldPrice: 110,
+    discount: 22,
+    img1: "https://e0.pxfuel.com/wallpapers/1023/735/desktop-wallpaper-may-contain-1-person-standing-child-and-outdoor-cute-baby-cute-little-baby-girl-cute-baby-girl-anahita-hashemzadeh.jpg",
+    img2: "https://images.unsplash.com/photo-1621452973707-639662783c8c?auto=format&fit=crop&q=80",
+    img3: "https://images.unsplash.com/photo-1606456041040-7e6d24a7374b?auto=format&fit=crop&q=80"
+  },
+   {
+    id: 8,
+    name: "Chineese model",
+    modelName: "summer Gala",
+    price: 85,
+    oldPrice: 110,
+    discount: 22,
+    img1: "https://e0.pxfuel.com/wallpapers/658/851/desktop-wallpaper-may-contain-1-person-standing-child-and-outdoor-cute-baby-cute-little-baby-girl-world-s-cutest-baby-anahita-hashemzadeh.jpg",
+    img2: "https://images.unsplash.com/photo-1621452973707-639662783c8c?auto=format&fit=crop&q=80",
+    img3: "https://images.unsplash.com/photo-1606456041040-7e6d24a7374b?auto=format&fit=crop&q=80"
+  },
+];
+export const BANNER_IMAGES = [
+         "https://images.wallpapersden.com/image/download/cute-baby-girl-child-in-light-pink-dress_bWZsaWaUmZqaraWkpJRmbmdlrWZlbWU.jpg",
+         "https://www.pixelstalk.net/wp-content/uploads/2016/10/Lovely-Baby-Girl-Wallpaper-Widescreen.jpg",
+         "https://wallpaperset.com/w/full/5/8/1/149470.jpg",
+        "https://www.pixelstalk.net/wp-content/uploads/2016/10/Free-Lovely-Baby-Girl-Image-1.jpg",
+]
