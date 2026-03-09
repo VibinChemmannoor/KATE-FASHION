@@ -1,31 +1,29 @@
-import { Geist, Geist_Mono } from "next/font/google";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import { Playfair_Display, Inter } from "next/font/google";
+import { Header } from "@/components/organisms/Header";
+import { Footer } from "@/components/organisms/Footer";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
 export const metadata = {
-  title: "Kate Fashion | Luxury Childrenwear",
-  description: "Modern elegance for the next generation.",
+  title: "KATERI | Luxury Childrenwear",
+  description: "Sustainability meets style. We're dedicated to creating beautiful, safe, and organic garments for the next generation.",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}
-      >
-        <Navbar />
-        {children}
+      <body className={`${playfair.variable} ${inter.variable} antialiased font-sans min-h-screen flex flex-col`}>
+        <Header />
+        <main className="flex-grow">{children}</main>
         <Footer />
       </body>
     </html>
