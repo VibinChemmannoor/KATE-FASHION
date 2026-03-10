@@ -26,7 +26,7 @@ export function CategoryShowcase() {
           <div className="absolute bottom-0 left-0 p-8 w-full flex flex-col items-start transform transition-transform duration-300">
             <h3 className="text-3xl font-serif font-bold text-[#FDFBF7] mb-4">The Artisan Knitwear</h3>
             <Link 
-              href="/collections/artisan-knitwear" 
+              href="/category/artisan-knitwear" 
               className="bg-[#FDFBF7] text-[#4A3525] font-semibold font-sans px-6 py-3 rounded-full text-sm hover:bg-[#F5F0E6] transition-colors"
             >
               Explore Collection
@@ -49,7 +49,7 @@ export function CategoryShowcase() {
           <div className="absolute bottom-0 left-0 w-full p-8 flex flex-col items-center text-center transform transition-transform duration-300">
             <h3 className="text-3xl font-serif font-bold text-[#FDFBF7] mb-4 drop-shadow-sm">Newborn Essentials</h3>
             <Link 
-              href="/collections/newborn-essentials" 
+              href="/category/newborn-essentials" 
               className="bg-[#FDFBF7] text-[#4A3525] font-semibold font-sans px-6 py-3 rounded-full text-sm hover:bg-[#F5F0E6] transition-colors shadow-sm"
             >
               Shop Essentials
