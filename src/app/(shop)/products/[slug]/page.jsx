@@ -10,10 +10,10 @@ const mockProduct = {
   price: "$54.00",
   description: "Crafted from GOTS certified organic cotton, this soft ribbed romper features nickel-free snaps for easy changes and a gentle stretch for growing little ones.",
   colors: [
-    { name: 'Caramel', hex: '#D29E74' },
-    { name: 'Cream', hex: '#FDFBF7' },
-    { name: 'Sage', hex: '#8F9B8B' },
-    { name: 'White', hex: '#FFFFFF' }
+    { name: 'Caramel', swatchClass: 'bg-[#D29E74]' },
+    { name: 'Cream', swatchClass: 'bg-[#FDFBF7]' },
+    { name: 'Sage', swatchClass: 'bg-[#8F9B8B]' },
+    { name: 'White', swatchClass: 'bg-white' }
   ],
   sizes: [
     { size: '0-3M', stock: 5 },
@@ -42,10 +42,16 @@ const mockProduct = {
   ]
 };
 
-export const metadata = {
-  title: "Organic Ribbed Cotton Romper | KATERI",
-  description: "Crafted from GOTS certified organic cotton, this soft ribbed romper features nickel-free snaps.",
-};
+/**
+ * @returns {Promise<import("next").Metadata>}
+ */
+export async function generateMetadata() {
+  return {
+    title: `${mockProduct.name} | KATERI`,
+    description: mockProduct.description,
+    alternates: { canonical: "https://yourdomain.com/products/organic-ribbed-cotton-romper" },
+  };
+}
 
 export default function ProductDetailPage() {
   return (

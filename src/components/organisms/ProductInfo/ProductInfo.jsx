@@ -57,9 +57,8 @@ export function ProductInfo({ product }) {
               }`}
               aria-label={`Select color ${color.name}`}
             >
-              <span 
-                className="block w-full h-full rounded-full border border-black/10 shadow-sm"
-                style={{ backgroundColor: color.hex }}
+              <span
+                className={`block w-full h-full rounded-full border border-black/10 shadow-sm ${color.swatchClass}`}
               />
             </button>
           ))}

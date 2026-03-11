@@ -28,7 +28,7 @@ export function Header() {
           <button aria-label="Search" className="hover:text-[#EC7F13] transition-colors">
             <Search size={22} strokeWidth={1.5} />
           </button>
-          <Link href="/account" aria-label="Account" className="hover:text-[#EC7F13] transition-colors">
+          <Link href="/login" aria-label="Account" className="hover:text-[#EC7F13] transition-colors">
             <User size={22} strokeWidth={1.5} />
           </Link>
           <Link href="/wishlist" aria-label="Wishlist" className="hover:text-[#EC7F13] transition-colors">

@@ -5,9 +5,9 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const SIZES = ['NB', '0-3M', '3-6M', '6-9M', '9-12M'];
 const COLORS = [
-  { name: 'Earth Brown', hex: '#633B2E' },
-  { name: 'Caramel Glow', hex: '#BE8A5A' },
-  { name: 'Sand Beige', hex: '#F0E8D7' }
+  { name: 'Earth Brown', swatchClass: 'bg-[#633B2E]' },
+  { name: 'Caramel Glow', swatchClass: 'bg-[#BE8A5A]' },
+  { name: 'Sand Beige', swatchClass: 'bg-[#F0E8D7]' }
 ];
 const MATERIALS = ['Organic Cotton', 'Merino Wool', 'Bamboo Fiber'];
 
@@ -93,9 +93,8 @@ export function FilterSidebar({ filters, onFilterChange }) {
               return (
                 <label key={color.name} className="flex items-center justify-between cursor-pointer group">
                   <div className="flex items-center gap-3">
-                    <span 
-                      className="w-5 h-5 rounded-full border border-black/10 shadow-sm"
-                      style={{ backgroundColor: color.hex }}
+                    <span
+                      className={`w-5 h-5 rounded-full border border-black/10 shadow-sm ${color.swatchClass}`}
                     />
                     <span className="text-sm font-sans text-[#6B4F3B] group-hover:text-[#4A3525]">{color.name}</span>
                   </div>

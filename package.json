@@ -9,12 +9,18 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@upstash/ratelimit": "^2.0.1",
+    "@upstash/redis": "^1.31.3",
+    "formik": "^2.4.9",
     "framer-motion": "^12.29.0",
+    "isomorphic-dompurify": "^2.15.0",
     "lucide-react": "^0.563.0",
     "next": "16.1.4",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "react-intersection-observer": "^10.0.3"
+    "react-intersection-observer": "^10.0.3",
+    "yup": "^1.7.1",
+    "zod": "^3.23.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
