@@ -3,12 +3,15 @@
 import { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import Link from "next/link";
 import { Eye, EyeOff, X, ArrowRight } from "lucide-react";
+import { encryptPassword } from "@/lib/security/clientEncrypt";
+import { BABY_NAME_MAX, PASSWORD_MIN, USERNAME_MIN, USERNAME_MAX } from "@/lib/utils/constants";
 
 const signupSchema = Yup.object({
   username: Yup.string()
-    .min(3, "Username must be at least 3 characters")
-    .max(20, "Username must be 20 characters or less")
+    .min(USERNAME_MIN, `Username must be at least ${USERNAME_MIN} characters`)
+    .max(USERNAME_MAX, `Username must be ${USERNAME_MAX} characters or less`)
     .matches(/^[a-zA-Z0-9_]+$/, "Only letters, numbers, and underscores")
     .required("Username is required"),
 
@@ -19,7 +22,7 @@ const signupSchema = Yup.object({
     .required("Phone number is required"),
 
   password: Yup.string()
-    .min(8, "Password must be at least 8 characters")
+    .min(PASSWORD_MIN, `Password must be at least ${PASSWORD_MIN} characters`)
     .matches(/[A-Z]/, "Must contain at least one uppercase letter")
     .matches(/[0-9]/, "Must contain at least one number")
     .required("Password is required"),
@@ -28,7 +31,7 @@ const signupSchema = Yup.object({
     .oneOf([Yup.ref("password"), null], "Passwords do not match")
     .required("Please confirm your password"),
 
-  babyName: Yup.string().max(50, "Name too long"),
+  babyName: Yup.string().max(BABY_NAME_MAX, "Name too long"),
 
   babyDob: Yup.date()
     .max(new Date(), "Date cannot be in the future")
@@ -104,9 +107,10 @@ function PasswordField({ id, label, formik }) {
   );
 }
 
-export function AuthRegisterPage({ isOpen = true, onClose = () => {}, onSignIn = () => {} }) {
+export function AuthRegisterPage({ isOpen = true, onClose = () => {} }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const formik = useFormik({
     initialValues: {
@@ -123,12 +127,35 @@ export function AuthRegisterPage({ isOpen = true, onClose = () => {}, onSignIn =
     validateOnChange: false,
     onSubmit: async (values, { resetForm }) => {
       setIsSubmitting(true);
-      await new Promise((res) => setTimeout(res, 1600));
-      console.log("Signup submitted:", values);
-      setIsSubmitting(false);
-      setSubmitSuccess(true);
-      resetForm();
-      setTimeout(() => setSubmitSuccess(false), 3000);
+      setSubmitError("");
+      setSubmitSuccess(false);
+
+      try {
+        const encryptedPassword = await encryptPassword(values.password);
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: values.username,
+            email: values.email,
+            phone: values.phone,
+            password: encryptedPassword,
+            babyName: values.babyName,
+            babyDob: values.babyDob,
+          }),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          setSubmitError(data?.error || "Unable to create account");
+          return;
+        }
+        setSubmitSuccess(true);
+        resetForm();
+      } catch (error) {
+        setSubmitError("Unable to create account");
+      } finally {
+        setIsSubmitting(false);
+      }
     },
   });
 
@@ -156,6 +183,12 @@ export function AuthRegisterPage({ isOpen = true, onClose = () => {}, onSignIn =
           {submitSuccess && (
             <div className="mb-6 px-4 py-3 rounded-lg text-sm text-center font-medium bg-[#E8F5E9] text-[#2E7D32]">
               Account created successfully
+            </div>
+          )}
+
+          {submitError && (
+            <div className="mb-6 px-4 py-3 rounded-lg text-sm text-center font-medium bg-[#FDECEC] text-[#B24545]">
+              {submitError}
             </div>
           )}
 
@@ -235,13 +268,9 @@ export function AuthRegisterPage({ isOpen = true, onClose = () => {}, onSignIn =
 
           <p className="mt-5 text-center text-sm text-[#9E8475]">
             Already have an account?{" "}
-            <button
-              type="button"
-              className="font-medium hover:underline text-[#C28A5A]"
-              onClick={onSignIn}
-            >
+            <Link href="/login" className="font-medium hover:underline text-[#C28A5A]">
               Sign in
-            </button>
+            </Link>
           </p>
         </div>
       </div>

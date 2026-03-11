@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import Link from "next/link";
 import { Eye, EyeOff, Lock, X } from "lucide-react";
+import { encryptPassword } from "@/lib/security/clientEncrypt";
+import { PASSWORD_MIN } from "@/lib/utils/constants";
 
 const loginSchema = Yup.object({
   identifier: Yup.string()
@@ -15,7 +18,7 @@ const loginSchema = Yup.object({
     })
     .required("Email or phone number is required"),
   password: Yup.string()
-    .min(8, "Password must be at least 8 characters")
+    .min(PASSWORD_MIN, `Password must be at least ${PASSWORD_MIN} characters`)
     .required("Password is required"),
 });
 
@@ -32,6 +35,7 @@ export function AuthLoginPage({ isOpen = true, onClose = () => {} }) {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const getInputBorderClass = (touched, error) => {
     if (touched && error) return "border-[#D97A6A]";
@@ -46,11 +50,27 @@ export function AuthLoginPage({ isOpen = true, onClose = () => {} }) {
     validateOnChange: false,
     onSubmit: async (values) => {
       setIsSubmitting(true);
-      await new Promise((res) => setTimeout(res, 1500));
-      console.log("Login submitted:", values);
-      setIsSubmitting(false);
-      setSubmitSuccess(true);
-      setTimeout(() => setSubmitSuccess(false), 3000);
+      setSubmitError("");
+      setSubmitSuccess(false);
+
+      try {
+        const encryptedPassword = await encryptPassword(values.password);
+        const response = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ identifier: values.identifier, password: encryptedPassword }),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          setSubmitError(data?.error || "Unable to sign in");
+          return;
+        }
+        setSubmitSuccess(true);
+      } catch (error) {
+        setSubmitError("Unable to sign in");
+      } finally {
+        setIsSubmitting(false);
+      }
     },
   });
 
@@ -82,6 +102,12 @@ export function AuthLoginPage({ isOpen = true, onClose = () => {} }) {
           {submitSuccess && (
             <div className="mb-5 px-4 py-3 rounded-lg text-sm text-center font-medium bg-[#E8F5E9] text-[#2E7D32]">
               Signed in successfully
+            </div>
+          )}
+
+          {submitError && (
+            <div className="mb-5 px-4 py-3 rounded-lg text-sm text-center font-medium bg-[#FDECEC] text-[#B24545]">
+              {submitError}
             </div>
           )}
 
@@ -187,13 +213,9 @@ export function AuthLoginPage({ isOpen = true, onClose = () => {} }) {
 
           <p className="mt-6 text-center text-sm text-[#9E8475]">
             Don&apos;t have an account?{" "}
-            <button
-              type="button"
-              className="font-medium hover:underline text-[#C28A5A]"
-              onClick={() => alert("Navigate to register")}
-            >
+            <Link href="/register" className="font-medium hover:underline text-[#C28A5A]">
               Create an account
-            </button>
+            </Link>
           </p>
         </div>
       </div>
