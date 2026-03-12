@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-kate-cream: #FDFBF7;
-  --color-kate-caramel: #EC7F13;
-  --color-kate-light-beige: #F5F0E6;
-  --color-kate-brown: #6B4F3B;
-  
+  --color-kate-cream: #fdfbf7;
+  --color-kate-caramel: #ec7f13;
+  --color-kate-light-beige: #f5f0e6;
+  --color-kate-brown: #6b4f3b;
+
   --color-background: var(--color-kate-cream);
   --color-foreground: var(--color-kate-brown);
 }

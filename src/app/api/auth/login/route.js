@@ -28,7 +28,10 @@ const loginSchema = z.object({
  */
 export async function POST(request) {
   try {
-    const limit = await rateLimit(request, { max: AUTH_RATE_LIMIT_MAX, window: AUTH_RATE_LIMIT_WINDOW });
+    const limit = await rateLimit(request, {
+      max: AUTH_RATE_LIMIT_MAX,
+      window: AUTH_RATE_LIMIT_WINDOW,
+    });
     if (!limit.success) {
       return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
@@ -48,7 +51,11 @@ export async function POST(request) {
     const identifier = validated.data.identifier.toLowerCase();
 
     const user = await User.findOne({
-      $or: [{ email: identifier }, { phone: validated.data.identifier }, { username: validated.data.identifier }],
+      $or: [
+        { email: identifier },
+        { phone: validated.data.identifier },
+        { username: validated.data.identifier },
+      ],
     });
 
     if (!user) {

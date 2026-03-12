@@ -7,16 +7,16 @@
 
 ## 📌 Project Overview
 
-| Property | Value |
-|---|---|
-| **App Type** | B2C Ecommerce (Full-Stack) |
-| **Framework** | Next.js 14+ (App Router) |
-| **Language** | JavaScript (ES2022+, NO TypeScript) |
-| **Styling** | Tailwind CSS v3 |
+| Property          | Value                                                             |
+| ----------------- | ----------------------------------------------------------------- |
+| **App Type**      | B2C Ecommerce (Full-Stack)                                        |
+| **Framework**     | Next.js 14+ (App Router)                                          |
+| **Language**      | JavaScript (ES2022+, NO TypeScript)                               |
+| **Styling**       | Tailwind CSS v3                                                   |
 | **Design System** | Atomic Design (atoms → molecules → organisms → templates → pages) |
-| **Payments** | Razorpay, Google Pay, PhonePe, Paytm |
-| **Rendering** | SSR / SSG / ISR / Server Components |
-| **Target** | Mobile-first, fully responsive, SEO-optimised |
+| **Payments**      | Razorpay, Google Pay, PhonePe, Paytm                              |
+| **Rendering**     | SSR / SSG / ISR / Server Components                               |
+| **Target**        | Mobile-first, fully responsive, SEO-optimised                     |
 
 ---
 
@@ -243,6 +243,7 @@ D — Dependency Inversion  : Components depend on abstractions (hooks/context),
 ```
 
 **Example — SOLID-compliant ProductCard:**
+
 ```jsx
 // ✅ CORRECT — Single responsibility, receives data via props
 export function ProductCard({ product, onAddToCart, onWishlist }) {
@@ -284,30 +285,30 @@ export function ProductCard({ productId }) {
 
 ```js
 // middleware.js — Protect routes at edge level
-import { withAuth } from 'next-auth/middleware'
-import { NextResponse } from 'next/server'
+import { withAuth } from "next-auth/middleware";
+import { NextResponse } from "next/server";
 
 export default withAuth(
   function middleware(req) {
-    const { token } = req.nextauth
-    const path = req.nextUrl.pathname
+    const { token } = req.nextauth;
+    const path = req.nextUrl.pathname;
 
     // Admin-only routes
-    if (path.startsWith('/admin') && token?.role !== 'ADMIN') {
-      return NextResponse.redirect(new URL('/unauthorized', req.url))
+    if (path.startsWith("/admin") && token?.role !== "ADMIN") {
+      return NextResponse.redirect(new URL("/unauthorized", req.url));
     }
 
     // Account routes require auth
-    if (path.startsWith('/account') && !token) {
-      return NextResponse.redirect(new URL('/login', req.url))
+    if (path.startsWith("/account") && !token) {
+      return NextResponse.redirect(new URL("/login", req.url));
     }
   },
   { callbacks: { authorized: ({ token }) => !!token } }
-)
+);
 
 export const config = {
-  matcher: ['/admin/:path*', '/account/:path*', '/checkout/:path*']
-}
+  matcher: ["/admin/:path*", "/account/:path*", "/checkout/:path*"],
+};
 ```
 
 ### 2. Security Headers
@@ -315,27 +316,27 @@ export const config = {
 ```js
 // next.config.js — Security headers for ALL responses
 const securityHeaders = [
-  { key: 'X-DNS-Prefetch-Control', value: 'on' },
-  { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-  { key: 'X-Content-Type-Options', value: 'nosniff' },
-  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+  { key: "X-DNS-Prefetch-Control", value: "on" },
+  { key: "X-Frame-Options", value: "SAMEORIGIN" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
   {
-    key: 'Content-Security-Policy',
+    key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' https://checkout.razorpay.com https://api.phonepe.com",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https://res.cloudinary.com",
       "connect-src 'self' https://api.razorpay.com",
-      "frame-src https://api.razorpay.com https://securegw.paytm.in"
-    ].join('; ')
+      "frame-src https://api.razorpay.com https://securegw.paytm.in",
+    ].join("; "),
   },
   {
-    key: 'Strict-Transport-Security',
-    value: 'max-age=63072000; includeSubDomains; preload'
-  }
-]
+    key: "Strict-Transport-Security",
+    value: "max-age=63072000; includeSubDomains; preload",
+  },
+];
 ```
 
 ### 3. API Route Security Pattern
@@ -344,47 +345,46 @@ const securityHeaders = [
 
 ```js
 // Template for ALL API route handlers
-import { getServerSession } from 'next-auth'
-import { authConfig } from '@/lib/auth/config'
-import { rateLimit } from '@/lib/security/rateLimit'
-import { sanitizeInput } from '@/lib/security/sanitize'
-import { validateSchema } from '@/lib/utils/validation'
-import { NextResponse } from 'next/server'
+import { getServerSession } from "next-auth";
+import { authConfig } from "@/lib/auth/config";
+import { rateLimit } from "@/lib/security/rateLimit";
+import { sanitizeInput } from "@/lib/security/sanitize";
+import { validateSchema } from "@/lib/utils/validation";
+import { NextResponse } from "next/server";
 
 export async function POST(request) {
   try {
     // 1. Rate limiting
-    const rateLimitResult = await rateLimit(request, { max: 10, window: '1m' })
+    const rateLimitResult = await rateLimit(request, { max: 10, window: "1m" });
     if (!rateLimitResult.success) {
-      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
 
     // 2. Authentication check
-    const session = await getServerSession(authConfig)
+    const session = await getServerSession(authConfig);
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // 3. Input parsing & sanitization
-    const body = await request.json()
-    const sanitized = sanitizeInput(body)
+    const body = await request.json();
+    const sanitized = sanitizeInput(body);
 
     // 4. Schema validation
-    const validated = validateSchema(sanitized, myZodSchema)
+    const validated = validateSchema(sanitized, myZodSchema);
     if (!validated.success) {
-      return NextResponse.json({ error: validated.errors }, { status: 400 })
+      return NextResponse.json({ error: validated.errors }, { status: 400 });
     }
 
     // 5. Business logic
-    const result = await myBusinessLogic(validated.data, session.user.id)
+    const result = await myBusinessLogic(validated.data, session.user.id);
 
     // 6. Return sanitized response (never expose raw DB objects)
-    return NextResponse.json({ data: result }, { status: 200 })
-
+    return NextResponse.json({ data: result }, { status: 200 });
   } catch (error) {
     // 7. Never expose internal errors to client
-    console.error('[API Error]', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    console.error("[API Error]", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 ```
@@ -393,7 +393,7 @@ export async function POST(request) {
 
 ```js
 // lib/security/sanitize.js
-import DOMPurify from 'isomorphic-dompurify'
+import DOMPurify from "isomorphic-dompurify";
 
 /**
  * Recursively sanitize all string values in an object
@@ -401,14 +401,12 @@ import DOMPurify from 'isomorphic-dompurify'
  * @returns {Object|string}
  */
 export function sanitizeInput(input) {
-  if (typeof input === 'string') return DOMPurify.sanitize(input.trim())
-  if (Array.isArray(input)) return input.map(sanitizeInput)
-  if (typeof input === 'object' && input !== null) {
-    return Object.fromEntries(
-      Object.entries(input).map(([k, v]) => [k, sanitizeInput(v)])
-    )
+  if (typeof input === "string") return DOMPurify.sanitize(input.trim());
+  if (Array.isArray(input)) return input.map(sanitizeInput);
+  if (typeof input === "object" && input !== null) {
+    return Object.fromEntries(Object.entries(input).map(([k, v]) => [k, sanitizeInput(v)]));
   }
-  return input
+  return input;
 }
 ```
 
@@ -416,13 +414,13 @@ export function sanitizeInput(input) {
 
 ```js
 // lib/security/rateLimit.js
-import { Ratelimit } from '@upstash/ratelimit'
-import { Redis } from '@upstash/redis'
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(10, '10 s'),
-})
+  limiter: Ratelimit.slidingWindow(10, "10 s"),
+});
 
 /**
  * Apply rate limiting to an API request
@@ -430,8 +428,8 @@ const ratelimit = new Ratelimit({
  * @param {{ max: number, window: string }} options
  */
 export async function rateLimit(request, options) {
-  const ip = request.headers.get('x-forwarded-for') ?? '127.0.0.1'
-  return ratelimit.limit(ip)
+  const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
+  return ratelimit.limit(ip);
 }
 ```
 
@@ -439,15 +437,15 @@ export async function rateLimit(request, options) {
 
 ```js
 // lib/security/csrf.js
-import { createHash, randomBytes } from 'crypto'
+import { createHash, randomBytes } from "crypto";
 
 export function generateCsrfToken() {
-  return randomBytes(32).toString('hex')
+  return randomBytes(32).toString("hex");
 }
 
 export function verifyCsrfToken(token, sessionToken) {
-  const expected = createHash('sha256').update(sessionToken).digest('hex')
-  return token === expected
+  const expected = createHash("sha256").update(sessionToken).digest("hex");
+  return token === expected;
 }
 ```
 
@@ -462,11 +460,11 @@ export function verifyCsrfToken(token, sessionToken) {
 ```js
 // ✅ CORRECT
 const product = await prisma.product.findFirst({
-  where: { slug: params.slug }  // Prisma handles parameterization
-})
+  where: { slug: params.slug }, // Prisma handles parameterization
+});
 
 // ❌ NEVER DO THIS
-const product = await prisma.$queryRaw`SELECT * FROM products WHERE slug = ${params.slug}`
+const product = await prisma.$queryRaw`SELECT * FROM products WHERE slug = ${params.slug}`;
 ```
 
 ### 8. Environment Variables Security
@@ -508,9 +506,9 @@ ENCRYPTION_KEY=              # 32-char key for sensitive data encryption
 
 ```js
 // lib/payment/payment.factory.js
-import { RazorpayProvider } from './razorpay'
-import { PhonePeProvider } from './phonepe'
-import { PaytmProvider } from './paytm'
+import { RazorpayProvider } from "./razorpay";
+import { PhonePeProvider } from "./phonepe";
+import { PaytmProvider } from "./paytm";
 
 const PROVIDERS = {
   razorpay: RazorpayProvider,
@@ -518,7 +516,7 @@ const PROVIDERS = {
   paytm: PaytmProvider,
   // Google Pay is handled via Razorpay (UPI intent flow)
   googlepay: RazorpayProvider,
-}
+};
 
 /**
  * Get the payment provider by name
@@ -526,9 +524,9 @@ const PROVIDERS = {
  * @returns {PaymentProvider}
  */
 export function getPaymentProvider(provider) {
-  const Provider = PROVIDERS[provider]
-  if (!Provider) throw new Error(`Unknown payment provider: ${provider}`)
-  return new Provider()
+  const Provider = PROVIDERS[provider];
+  if (!Provider) throw new Error(`Unknown payment provider: ${provider}`);
+  return new Provider();
 }
 ```
 
@@ -536,26 +534,26 @@ export function getPaymentProvider(provider) {
 
 ```js
 // lib/payment/razorpay.js
-import Razorpay from 'razorpay'
-import { createHmac } from 'crypto'
+import Razorpay from "razorpay";
+import { createHmac } from "crypto";
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
-})
+});
 
 export class RazorpayProvider {
   /**
    * Create a Razorpay order — SERVER SIDE ONLY
    * @param {{ amount: number, currency: string, receipt: string }} options
    */
-  async createOrder({ amount, currency = 'INR', receipt }) {
+  async createOrder({ amount, currency = "INR", receipt }) {
     return razorpay.orders.create({
       amount: Math.round(amount * 100), // Razorpay uses paise
       currency,
       receipt,
       payment_capture: 1,
-    })
+    });
   }
 
   /**
@@ -564,11 +562,11 @@ export class RazorpayProvider {
    * @returns {boolean}
    */
   verifySignature({ orderId, paymentId, signature }) {
-    const body = `${orderId}|${paymentId}`
-    const expected = createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+    const body = `${orderId}|${paymentId}`;
+    const expected = createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
       .update(body)
-      .digest('hex')
-    return expected === signature
+      .digest("hex");
+    return expected === signature;
   }
 
   /**
@@ -577,10 +575,10 @@ export class RazorpayProvider {
    * @param {string} signature - X-Razorpay-Signature header
    */
   verifyWebhook(body, signature) {
-    const expected = createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET)
+    const expected = createHmac("sha256", process.env.RAZORPAY_WEBHOOK_SECRET)
       .update(body)
-      .digest('hex')
-    return expected === signature
+      .digest("hex");
+    return expected === signature;
   }
 }
 ```
@@ -589,48 +587,46 @@ export class RazorpayProvider {
 
 ```js
 // app/api/payment/razorpay/create-order/route.js
-import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authConfig } from '@/lib/auth/config'
-import { getPaymentProvider } from '@/lib/payment/payment.factory'
-import { rateLimit } from '@/lib/security/rateLimit'
-import { prisma } from '@/lib/db/prisma'
-import { nanoid } from 'nanoid'
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authConfig } from "@/lib/auth/config";
+import { getPaymentProvider } from "@/lib/payment/payment.factory";
+import { rateLimit } from "@/lib/security/rateLimit";
+import { prisma } from "@/lib/db/prisma";
+import { nanoid } from "nanoid";
 
 export async function POST(request) {
   try {
     // Rate limit: 5 order creation attempts per minute
-    const limit = await rateLimit(request, { max: 5, window: '1m' })
+    const limit = await rateLimit(request, { max: 5, window: "1m" });
     if (!limit.success) {
-      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
 
-    const session = await getServerSession(authConfig)
+    const session = await getServerSession(authConfig);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { cartId, provider = 'razorpay' } = await request.json()
+    const { cartId, provider = "razorpay" } = await request.json();
 
     // Fetch cart and calculate amount server-side — NEVER trust client amount
     const cart = await prisma.cart.findUnique({
       where: { id: cartId, userId: session.user.id },
-      include: { items: { include: { product: true } } }
-    })
+      include: { items: { include: { product: true } } },
+    });
 
     if (!cart) {
-      return NextResponse.json({ error: 'Cart not found' }, { status: 404 })
+      return NextResponse.json({ error: "Cart not found" }, { status: 404 });
     }
 
-    const amount = cart.items.reduce(
-      (sum, item) => sum + item.product.price * item.quantity, 0
-    )
+    const amount = cart.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
-    const paymentProvider = getPaymentProvider(provider)
+    const paymentProvider = getPaymentProvider(provider);
     const order = await paymentProvider.createOrder({
       amount,
       receipt: `receipt_${nanoid(10)}`,
-    })
+    });
 
     // Store pending order in DB
     await prisma.order.create({
@@ -638,16 +634,16 @@ export async function POST(request) {
         userId: session.user.id,
         razorpayOrderId: order.id,
         amount,
-        status: 'PENDING',
+        status: "PENDING",
         items: {
-          create: cart.items.map(item => ({
+          create: cart.items.map((item) => ({
             productId: item.productId,
             quantity: item.quantity,
             price: item.product.price,
-          }))
-        }
-      }
-    })
+          })),
+        },
+      },
+    });
 
     // Return only what client needs — never expose secret keys
     return NextResponse.json({
@@ -655,11 +651,10 @@ export async function POST(request) {
       amount: order.amount,
       currency: order.currency,
       keyId: process.env.RAZORPAY_KEY_ID, // Public key only
-    })
-
+    });
   } catch (error) {
-    console.error('[Razorpay Create Order]', error)
-    return NextResponse.json({ error: 'Payment initiation failed' }, { status: 500 })
+    console.error("[Razorpay Create Order]", error);
+    return NextResponse.json({ error: "Payment initiation failed" }, { status: 500 });
   }
 }
 ```
@@ -668,32 +663,32 @@ export async function POST(request) {
 
 ```js
 // app/api/payment/razorpay/verify/route.js
-import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authConfig } from '@/lib/auth/config'
-import { getPaymentProvider } from '@/lib/payment/payment.factory'
-import { prisma } from '@/lib/db/prisma'
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authConfig } from "@/lib/auth/config";
+import { getPaymentProvider } from "@/lib/payment/payment.factory";
+import { prisma } from "@/lib/db/prisma";
 
 export async function POST(request) {
   try {
-    const session = await getServerSession(authConfig)
+    const session = await getServerSession(authConfig);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { razorpayOrderId, razorpayPaymentId, razorpaySignature } = await request.json()
+    const { razorpayOrderId, razorpayPaymentId, razorpaySignature } = await request.json();
 
     // Verify signature — CRITICAL security step
-    const provider = getPaymentProvider('razorpay')
+    const provider = getPaymentProvider("razorpay");
     const isValid = provider.verifySignature({
       orderId: razorpayOrderId,
       paymentId: razorpayPaymentId,
       signature: razorpaySignature,
-    })
+    });
 
     if (!isValid) {
-      console.warn('[Payment Fraud Attempt]', { razorpayOrderId, userId: session.user.id })
-      return NextResponse.json({ error: 'Invalid payment signature' }, { status: 400 })
+      console.warn("[Payment Fraud Attempt]", { razorpayOrderId, userId: session.user.id });
+      return NextResponse.json({ error: "Invalid payment signature" }, { status: 400 });
     }
 
     // Update order status
@@ -701,19 +696,18 @@ export async function POST(request) {
       where: { razorpayOrderId, userId: session.user.id },
       data: {
         razorpayPaymentId,
-        status: 'PAID',
+        status: "PAID",
         paidAt: new Date(),
-      }
-    })
+      },
+    });
 
     // Clear cart after successful payment
-    await prisma.cart.deleteMany({ where: { userId: session.user.id } })
+    await prisma.cart.deleteMany({ where: { userId: session.user.id } });
 
-    return NextResponse.json({ success: true })
-
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[Razorpay Verify]', error)
-    return NextResponse.json({ error: 'Verification failed' }, { status: 500 })
+    console.error("[Razorpay Verify]", error);
+    return NextResponse.json({ error: "Verification failed" }, { status: 500 });
   }
 }
 ```
@@ -722,34 +716,34 @@ export async function POST(request) {
 
 ```js
 // app/api/webhook/razorpay/route.js
-import { NextResponse } from 'next/server'
-import { getPaymentProvider } from '@/lib/payment/payment.factory'
-import { prisma } from '@/lib/db/prisma'
+import { NextResponse } from "next/server";
+import { getPaymentProvider } from "@/lib/payment/payment.factory";
+import { prisma } from "@/lib/db/prisma";
 
 export async function POST(request) {
-  const body = await request.text() // Raw body for signature check
-  const signature = request.headers.get('x-razorpay-signature')
+  const body = await request.text(); // Raw body for signature check
+  const signature = request.headers.get("x-razorpay-signature");
 
-  const provider = getPaymentProvider('razorpay')
+  const provider = getPaymentProvider("razorpay");
   if (!provider.verifyWebhook(body, signature)) {
-    return NextResponse.json({ error: 'Invalid webhook' }, { status: 400 })
+    return NextResponse.json({ error: "Invalid webhook" }, { status: 400 });
   }
 
-  const event = JSON.parse(body)
+  const event = JSON.parse(body);
 
   switch (event.event) {
-    case 'payment.captured':
-      await handlePaymentCaptured(event.payload.payment.entity)
-      break
-    case 'payment.failed':
-      await handlePaymentFailed(event.payload.payment.entity)
-      break
-    case 'refund.processed':
-      await handleRefundProcessed(event.payload.refund.entity)
-      break
+    case "payment.captured":
+      await handlePaymentCaptured(event.payload.payment.entity);
+      break;
+    case "payment.failed":
+      await handlePaymentFailed(event.payload.payment.entity);
+      break;
+    case "refund.processed":
+      await handleRefundProcessed(event.payload.refund.entity);
+      break;
   }
 
-  return NextResponse.json({ received: true })
+  return NextResponse.json({ received: true });
 }
 ```
 
@@ -766,20 +760,20 @@ export async function POST(request) {
  * @returns {Promise<import('next').Metadata>}
  */
 export async function generateMetadata({ params }) {
-  const product = await getProduct(params.slug)
+  const product = await getProduct(params.slug);
 
   return {
     title: `${product.name} | ShopName`,
     description: product.description.slice(0, 160),
-    keywords: product.tags.join(', '),
+    keywords: product.tags.join(", "),
     openGraph: {
       title: product.name,
       description: product.description.slice(0, 200),
       images: [{ url: product.image, width: 1200, height: 630, alt: product.name }],
-      type: 'website',
+      type: "website",
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title: product.name,
       description: product.description.slice(0, 200),
       images: [product.image],
@@ -790,9 +784,9 @@ export async function generateMetadata({ params }) {
     robots: {
       index: true,
       follow: true,
-      googleBot: { index: true, follow: true, 'max-image-preview': 'large' },
+      googleBot: { index: true, follow: true, "max-image-preview": "large" },
     },
-  }
+  };
 }
 ```
 
@@ -804,94 +798,95 @@ export async function generateMetadata({ params }) {
 /** Product schema for product detail pages */
 export function productSchema(product) {
   return {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
+    "@context": "https://schema.org",
+    "@type": "Product",
     name: product.name,
     description: product.description,
     image: product.images,
     sku: product.sku,
-    brand: { '@type': 'Brand', name: product.brand },
+    brand: { "@type": "Brand", name: product.brand },
     offers: {
-      '@type': 'Offer',
+      "@type": "Offer",
       price: product.price,
-      priceCurrency: 'INR',
-      availability: product.stock > 0
-        ? 'https://schema.org/InStock'
-        : 'https://schema.org/OutOfStock',
-      seller: { '@type': 'Organization', name: 'ShopName' }
+      priceCurrency: "INR",
+      availability:
+        product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      seller: { "@type": "Organization", name: "ShopName" },
     },
-    aggregateRating: product.reviews?.length ? {
-      '@type': 'AggregateRating',
-      ratingValue: product.avgRating,
-      reviewCount: product.reviews.length
-    } : undefined
-  }
+    aggregateRating: product.reviews?.length
+      ? {
+          "@type": "AggregateRating",
+          ratingValue: product.avgRating,
+          reviewCount: product.reviews.length,
+        }
+      : undefined,
+  };
 }
 
 /** Breadcrumb schema */
 export function breadcrumbSchema(items) {
   return {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
     itemListElement: items.map((item, i) => ({
-      '@type': 'ListItem',
+      "@type": "ListItem",
       position: i + 1,
       name: item.name,
-      item: item.url
-    }))
-  }
+      item: item.url,
+    })),
+  };
 }
 ```
 
 ### 3. Rendering Strategy per Page
 
-| Page | Strategy | Rationale |
-|---|---|---|
-| Home | ISR (revalidate: 3600) | Changes hourly, needs SEO |
-| Product Listing | ISR (revalidate: 1800) | Category pages, SEO critical |
-| Product Detail | SSG + generateStaticParams | Pre-built, max SEO, fast |
-| Search Results | SSR (dynamic) | Query-dependent |
-| Cart / Checkout | CSR (dynamic) | User-specific, no SEO needed |
-| Account Pages | SSR (protected) | Auth-required |
-| Admin | CSR (protected) | No SEO needed |
+| Page            | Strategy                   | Rationale                    |
+| --------------- | -------------------------- | ---------------------------- |
+| Home            | ISR (revalidate: 3600)     | Changes hourly, needs SEO    |
+| Product Listing | ISR (revalidate: 1800)     | Category pages, SEO critical |
+| Product Detail  | SSG + generateStaticParams | Pre-built, max SEO, fast     |
+| Search Results  | SSR (dynamic)              | Query-dependent              |
+| Cart / Checkout | CSR (dynamic)              | User-specific, no SEO needed |
+| Account Pages   | SSR (protected)            | Auth-required                |
+| Admin           | CSR (protected)            | No SEO needed                |
 
 ### 4. Sitemap
 
 ```js
 // app/sitemap.js — Auto-generated sitemap
-import { prisma } from '@/lib/db/prisma'
+import { prisma } from "@/lib/db/prisma";
 
 export default async function sitemap() {
   const products = await prisma.product.findMany({
-    select: { slug: true, updatedAt: true }
-  })
+    select: { slug: true, updatedAt: true },
+  });
 
   const categories = await prisma.category.findMany({
-    select: { slug: true, updatedAt: true }
-  })
+    select: { slug: true, updatedAt: true },
+  });
 
-  const staticPages = ['', '/products', '/about', '/contact'].map(path => ({
+  const staticPages = ["", "/products", "/about", "/contact"].map((path) => ({
     url: `https://yourdomain.com${path}`,
     lastModified: new Date(),
-    changeFrequency: 'weekly',
-    priority: path === '' ? 1 : 0.8,
-  }))
+    changeFrequency: "weekly",
+    priority: path === "" ? 1 : 0.8,
+  }));
 
   return [
     ...staticPages,
-    ...products.map(p => ({
+    ...products.map((p) => ({
       url: `https://yourdomain.com/products/${p.slug}`,
       lastModified: p.updatedAt,
-      changeFrequency: 'weekly',
+      changeFrequency: "weekly",
       priority: 0.7,
     })),
-    ...categories.map(c => ({
+    ...categories.map((c) => ({
       url: `https://yourdomain.com/category/${c.slug}`,
       lastModified: c.updatedAt,
-      changeFrequency: 'daily',
+      changeFrequency: "daily",
       priority: 0.6,
     })),
-  ]
+  ];
 }
 ```
 
@@ -960,7 +955,7 @@ xl:  ≥ 1280px  → xl:
 
 ```jsx
 // Always use next/image — NEVER <img> tag
-import Image from 'next/image'
+import Image from "next/image";
 
 // Product images
 <Image
@@ -972,51 +967,51 @@ import Image from 'next/image'
   placeholder="blur"
   blurDataURL={blurDataUrl}
   className="object-cover rounded-lg"
-/>
+/>;
 ```
 
 ### Fonts
 
 ```js
 // app/layout.jsx — Use next/font (zero layout shift)
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Geist, Geist_Mono } from "next/font/google";
 
-const sans = Geist({ subsets: ['latin'], variable: '--font-sans' })
+const sans = Geist({ subsets: ["latin"], variable: "--font-sans" });
 ```
 
 ### Code Splitting
 
 ```js
 // Lazy load heavy components
-import dynamic from 'next/dynamic'
+import dynamic from "next/dynamic";
 
-const RazorpayCheckout = dynamic(() => import('@/components/organisms/PaymentGateway'), {
+const RazorpayCheckout = dynamic(() => import("@/components/organisms/PaymentGateway"), {
   loading: () => <PaymentSkeleton />,
-  ssr: false  // Payment UI is client-only
-})
+  ssr: false, // Payment UI is client-only
+});
 
-const ProductReviews = dynamic(() => import('@/components/organisms/ReviewSection'))
+const ProductReviews = dynamic(() => import("@/components/organisms/ReviewSection"));
 ```
 
 ### Caching Strategy
 
 ```js
 // lib/db/queries/products.js
-import { unstable_cache } from 'next/cache'
-import { prisma } from '@/lib/db/prisma'
+import { unstable_cache } from "next/cache";
+import { prisma } from "@/lib/db/prisma";
 
 export const getProducts = unstable_cache(
   async (filters) => {
-    return prisma.product.findMany({ where: filters })
+    return prisma.product.findMany({ where: filters });
   },
-  ['products-list'],
-  { revalidate: 3600, tags: ['products'] }
-)
+  ["products-list"],
+  { revalidate: 3600, tags: ["products"] }
+);
 
 // Revalidate on mutation
-import { revalidateTag } from 'next/cache'
+import { revalidateTag } from "next/cache";
 // After product update:
-revalidateTag('products')
+revalidateTag("products");
 ```
 
 ---
@@ -1034,42 +1029,42 @@ tests/e2e/checkout.spec.js                 → E2E tests (Playwright)
 
 ### Required Test Coverage
 
-| Area | Tests Required |
-|---|---|
-| Payment signature verification | Unit — test valid + forged signatures |
-| API authentication | Integration — unauthorized returns 401 |
-| Rate limiting | Integration — exceeding limit returns 429 |
-| Input sanitization | Unit — XSS strings are stripped |
-| CSRF validation | Unit — invalid token rejected |
-| Cart total calculation | Unit — server-side amount matches DB |
-| Order creation | Integration — full flow |
-| Webhook verification | Unit — invalid webhook rejected |
+| Area                           | Tests Required                            |
+| ------------------------------ | ----------------------------------------- |
+| Payment signature verification | Unit — test valid + forged signatures     |
+| API authentication             | Integration — unauthorized returns 401    |
+| Rate limiting                  | Integration — exceeding limit returns 429 |
+| Input sanitization             | Unit — XSS strings are stripped           |
+| CSRF validation                | Unit — invalid token rejected             |
+| Cart total calculation         | Unit — server-side amount matches DB      |
+| Order creation                 | Integration — full flow                   |
+| Webhook verification           | Unit — invalid webhook rejected           |
 
 ### Test Pattern
 
 ```js
 // components/atoms/Button/Button.test.js
-import { render, screen, fireEvent } from '@testing-library/react'
-import { Button } from './Button'
+import { render, screen, fireEvent } from "@testing-library/react";
+import { Button } from "./Button";
 
-describe('Button', () => {
-  it('renders with correct label', () => {
-    render(<Button>Add to Cart</Button>)
-    expect(screen.getByRole('button')).toHaveTextContent('Add to Cart')
-  })
+describe("Button", () => {
+  it("renders with correct label", () => {
+    render(<Button>Add to Cart</Button>);
+    expect(screen.getByRole("button")).toHaveTextContent("Add to Cart");
+  });
 
-  it('calls onClick when clicked', () => {
-    const onClick = jest.fn()
-    render(<Button onClick={onClick}>Buy Now</Button>)
-    fireEvent.click(screen.getByRole('button'))
-    expect(onClick).toHaveBeenCalledTimes(1)
-  })
+  it("calls onClick when clicked", () => {
+    const onClick = jest.fn();
+    render(<Button onClick={onClick}>Buy Now</Button>);
+    fireEvent.click(screen.getByRole("button"));
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
 
-  it('is disabled when loading', () => {
-    render(<Button loading>Processing</Button>)
-    expect(screen.getByRole('button')).toBeDisabled()
-  })
-})
+  it("is disabled when loading", () => {
+    render(<Button loading>Processing</Button>);
+    expect(screen.getByRole("button")).toBeDisabled();
+  });
+});
 ```
 
 ---
@@ -1181,50 +1176,50 @@ enum OrderStatus {
 // tailwind.config.js
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ['./src/**/*.{js,jsx}'],
+  content: ["./src/**/*.{js,jsx}"],
   theme: {
     extend: {
       colors: {
         brand: {
-          50: '#fef7ee',
-          100: '#fdecd3',
-          500: '#f97316',  // Primary
-          600: '#ea6c0a',
-          900: '#7c2d12',
+          50: "#fef7ee",
+          100: "#fdecd3",
+          500: "#f97316", // Primary
+          600: "#ea6c0a",
+          900: "#7c2d12",
         },
         neutral: {
-          950: '#0a0a0a',
-        }
+          950: "#0a0a0a",
+        },
       },
       fontFamily: {
-        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-display)', 'system-ui', 'sans-serif'],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "system-ui", "sans-serif"],
       },
       screens: {
-        xs: '480px',
+        xs: "480px",
       },
       animation: {
-        'slide-in': 'slideIn 0.3s ease-out',
-        'fade-in': 'fadeIn 0.2s ease-in',
+        "slide-in": "slideIn 0.3s ease-out",
+        "fade-in": "fadeIn 0.2s ease-in",
       },
       keyframes: {
         slideIn: {
-          from: { transform: 'translateX(100%)' },
-          to: { transform: 'translateX(0)' },
+          from: { transform: "translateX(100%)" },
+          to: { transform: "translateX(0)" },
         },
         fadeIn: {
-          from: { opacity: '0' },
-          to: { opacity: '1' },
+          from: { opacity: "0" },
+          to: { opacity: "1" },
         },
       },
     },
   },
   plugins: [
-    require('@tailwindcss/forms'),
-    require('@tailwindcss/typography'),
-    require('@tailwindcss/aspect-ratio'),
+    require("@tailwindcss/forms"),
+    require("@tailwindcss/typography"),
+    require("@tailwindcss/aspect-ratio"),
   ],
-}
+};
 ```
 
 ---
@@ -1310,4 +1305,4 @@ Before every code generation, verify:
 
 ---
 
-*Last updated: 2025 | Stack: Next.js 14 · JavaScript · Tailwind CSS · Prisma · Razorpay · PhonePe · Paytm*
+_Last updated: 2025 | Stack: Next.js 14 · JavaScript · Tailwind CSS · Prisma · Razorpay · PhonePe · Paytm_

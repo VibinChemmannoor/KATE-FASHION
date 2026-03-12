@@ -15,13 +15,16 @@ const inter = Inter({
 
 export const metadata = {
   title: "KATERI | Luxury Childrenwear",
-  description: "Sustainability meets style. We're dedicated to creating beautiful, safe, and organic garments for the next generation.",
+  description:
+    "Sustainability meets style. We're dedicated to creating beautiful, safe, and organic garments for the next generation.",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${playfair.variable} ${inter.variable} antialiased font-sans min-h-screen flex flex-col`}>
+      <body
+        className={`${playfair.variable} ${inter.variable} antialiased font-sans min-h-screen flex flex-col`}
+      >
         <Header />
         <main className="flex-grow">{children}</main>
         <Footer />

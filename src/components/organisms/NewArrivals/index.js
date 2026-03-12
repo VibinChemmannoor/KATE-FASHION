@@ -1,1 +1,1 @@
-export { NewArrivals } from './NewArrivals';
+export { NewArrivals } from "./NewArrivals";

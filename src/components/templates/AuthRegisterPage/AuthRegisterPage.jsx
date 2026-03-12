@@ -77,7 +77,9 @@ function InputField({
           className={`w-full px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200 bg-[#FDFAF6] text-[#3D2B1F] border-[1.5px] shadow-[0_1px_3px_rgba(0,0,0,0.04)] focus:border-[#C28A5A] focus:ring-4 focus:ring-[#C28A5A]/20 ${rightElement ? "pr-12" : ""} ${getInputBorderClass(touched, error)} ${inputClassName}`}
           aria-invalid={hasError ? "true" : "false"}
         />
-        {rightElement && <div className="absolute right-3 top-1/2 -translate-y-1/2">{rightElement}</div>}
+        {rightElement && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2">{rightElement}</div>
+        )}
       </div>
       {hasError && <p className="text-xs text-[#D97A6A]">{error}</p>}
     </div>
@@ -177,7 +179,9 @@ export function AuthRegisterPage({ isOpen = true, onClose = () => {} }) {
             <h1 className="text-2xl sm:text-3xl font-bold mb-1.5 font-serif text-[#3D2B1F]">
               Create Your Account
             </h1>
-            <p className="text-sm text-[#9E8475]">Join Atelier Decor for a curated nursery experience.</p>
+            <p className="text-sm text-[#9E8475]">
+              Join Atelier Decor for a curated nursery experience.
+            </p>
           </div>
 
           {submitSuccess && (
@@ -252,7 +256,14 @@ export function AuthRegisterPage({ isOpen = true, onClose = () => {} }) {
               {isSubmitting ? (
                 <>
                   <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                   </svg>
                   Creating account...

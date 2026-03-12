@@ -1,0 +1,6 @@
+.next
+out
+build
+node_modules
+auth-private.pem
+auth-public.pem

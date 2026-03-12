@@ -1,1 +1,1 @@
-export { RecommendedForYou } from './RecommendedForYou';
+export { RecommendedForYou } from "./RecommendedForYou";

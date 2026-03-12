@@ -1,1 +1,1 @@
-export { WishlistGrid } from './WishlistGrid';
+export { WishlistGrid } from "./WishlistGrid";

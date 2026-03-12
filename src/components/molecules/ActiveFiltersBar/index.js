@@ -1,1 +1,1 @@
-export { ActiveFiltersBar } from './ActiveFiltersBar';
+export { ActiveFiltersBar } from "./ActiveFiltersBar";

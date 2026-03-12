@@ -1,1 +1,1 @@
-export { CompleteTheLook } from './CompleteTheLook';
+export { CompleteTheLook } from "./CompleteTheLook";

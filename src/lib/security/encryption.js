@@ -1,5 +1,9 @@
 import { createCipheriv, createDecipheriv, randomBytes } from "crypto";
-import { ENCRYPTION_ALGORITHM, ENCRYPTION_IV_BYTES, ENCRYPTION_TAG_BYTES } from "@/lib/utils/constants";
+import {
+  ENCRYPTION_ALGORITHM,
+  ENCRYPTION_IV_BYTES,
+  ENCRYPTION_TAG_BYTES,
+} from "@/lib/utils/constants";
 
 /**
  * @param {string} key

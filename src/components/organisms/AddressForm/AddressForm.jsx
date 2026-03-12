@@ -1,23 +1,23 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 export function AddressForm({ onAddAddress }) {
   const [formData, setFormData] = useState({
-    fullName: '',
-    phone: '',
-    email: '',
-    street: '',
-    town: '',
-    pincode: '',
-    isDefault: false
+    fullName: "",
+    phone: "",
+    email: "",
+    street: "",
+    town: "",
+    pincode: "",
+    isDefault: false,
   });
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -29,18 +29,26 @@ export function AddressForm({ onAddAddress }) {
 
   return (
     <div className="w-full">
-      <h2 className="text-3xl font-bold font-serif text-[#1a1b26] mb-2 tracking-tight">Add New Address</h2>
-      <p className="text-sm font-sans text-[#6B4F3B]/70 mb-8">Where should we deliver your order?</p>
+      <h2 className="text-3xl font-bold font-serif text-[#1a1b26] mb-2 tracking-tight">
+        Add New Address
+      </h2>
+      <p className="text-sm font-sans text-[#6B4F3B]/70 mb-8">
+        Where should we deliver your order?
+      </p>
 
-      <form onSubmit={handleSubmit} className="bg-white border border-[#EAE4DD] rounded-xl p-6 md:p-8">
-        
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white border border-[#EAE4DD] rounded-xl p-6 md:p-8"
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           {/* Full Name */}
           <div className="flex flex-col gap-2">
-            <label htmlFor="fullName" className="text-sm font-bold font-sans text-[#4A3525]">Full Name</label>
-            <input 
+            <label htmlFor="fullName" className="text-sm font-bold font-sans text-[#4A3525]">
+              Full Name
+            </label>
+            <input
               required
-              type="text" 
+              type="text"
               id="fullName"
               name="fullName"
               placeholder="e.g. Emily Thompson"
@@ -52,10 +60,12 @@ export function AddressForm({ onAddAddress }) {
 
           {/* Phone Number */}
           <div className="flex flex-col gap-2">
-            <label htmlFor="phone" className="text-sm font-bold font-sans text-[#4A3525]">Phone Number</label>
-            <input 
+            <label htmlFor="phone" className="text-sm font-bold font-sans text-[#4A3525]">
+              Phone Number
+            </label>
+            <input
               required
-              type="tel" 
+              type="tel"
               id="phone"
               name="phone"
               placeholder="+1 (555) 000-0000"
@@ -68,10 +78,12 @@ export function AddressForm({ onAddAddress }) {
 
         {/* Email Address */}
         <div className="flex flex-col gap-2 mb-6">
-          <label htmlFor="email" className="text-sm font-bold font-sans text-[#4A3525]">Email Address</label>
-          <input 
+          <label htmlFor="email" className="text-sm font-bold font-sans text-[#4A3525]">
+            Email Address
+          </label>
+          <input
             required
-            type="email" 
+            type="email"
             id="email"
             name="email"
             placeholder="emily@example.com"
@@ -83,8 +95,10 @@ export function AddressForm({ onAddAddress }) {
 
         {/* Street Address */}
         <div className="flex flex-col gap-2 mb-6">
-          <label htmlFor="street" className="text-sm font-bold font-sans text-[#4A3525]">Street Address</label>
-          <textarea 
+          <label htmlFor="street" className="text-sm font-bold font-sans text-[#4A3525]">
+            Street Address
+          </label>
+          <textarea
             required
             id="street"
             name="street"
@@ -99,10 +113,12 @@ export function AddressForm({ onAddAddress }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {/* Town / City */}
           <div className="flex flex-col gap-2">
-            <label htmlFor="town" className="text-sm font-bold font-sans text-[#4A3525]">Town / City</label>
-            <input 
+            <label htmlFor="town" className="text-sm font-bold font-sans text-[#4A3525]">
+              Town / City
+            </label>
+            <input
               required
-              type="text" 
+              type="text"
               id="town"
               name="town"
               placeholder="Your City"
@@ -114,10 +130,12 @@ export function AddressForm({ onAddAddress }) {
 
           {/* Pincode / ZIP */}
           <div className="flex flex-col gap-2">
-            <label htmlFor="pincode" className="text-sm font-bold font-sans text-[#4A3525]">Pincode / ZIP</label>
-            <input 
+            <label htmlFor="pincode" className="text-sm font-bold font-sans text-[#4A3525]">
+              Pincode / ZIP
+            </label>
+            <input
               required
-              type="text" 
+              type="text"
               id="pincode"
               name="pincode"
               placeholder="6-digit ZIP code"
@@ -130,8 +148,8 @@ export function AddressForm({ onAddAddress }) {
 
         {/* Default Checkbox */}
         <div className="flex items-center gap-3 mb-8">
-          <input 
-            type="checkbox" 
+          <input
+            type="checkbox"
             id="isDefault"
             name="isDefault"
             checked={formData.isDefault}
@@ -143,13 +161,12 @@ export function AddressForm({ onAddAddress }) {
           </label>
         </div>
 
-        <button 
+        <button
           type="submit"
           className="bg-[#EF831D] hover:bg-[#D47112] text-white font-bold font-sans px-8 py-3.5 rounded-lg transition-colors shadow-sm"
         >
           ADD ADDRESS
         </button>
-
       </form>
     </div>
   );

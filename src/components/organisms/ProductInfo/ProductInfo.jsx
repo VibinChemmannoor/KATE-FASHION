@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Heart, ShoppingBag, ShieldCheck, Truck, Leaf } from 'lucide-react';
+import { useState } from "react";
+import { Heart, ShoppingBag, ShieldCheck, Truck, Leaf } from "lucide-react";
 
 export function ProductInfo({ product }) {
   const [selectedColor, setSelectedColor] = useState(product.colors[0].name);
-  const [selectedSize, setSelectedSize] = useState('');
+  const [selectedSize, setSelectedSize] = useState("");
   const [isWishlisted, setIsWishlisted] = useState(false);
 
   // Example functionality logs
@@ -19,7 +19,7 @@ export function ProductInfo({ product }) {
 
   const handleToggleWishlist = () => {
     setIsWishlisted(!isWishlisted);
-    console.log(`${isWishlisted ? 'Removed from' : 'Added to'} wishlist: ${product.name}`);
+    console.log(`${isWishlisted ? "Removed from" : "Added to"} wishlist: ${product.name}`);
   };
 
   return (
@@ -53,7 +53,7 @@ export function ProductInfo({ product }) {
               key={color.name}
               onClick={() => setSelectedColor(color.name)}
               className={`w-8 h-8 rounded-full border-2 hover:scale-110 transition-transform ${
-                selectedColor === color.name ? 'border-[#A4550A] p-[2px]' : 'border-transparent'
+                selectedColor === color.name ? "border-[#A4550A] p-[2px]" : "border-transparent"
               }`}
               aria-label={`Select color ${color.name}`}
             >
@@ -87,11 +87,12 @@ export function ProductInfo({ product }) {
                 onClick={() => setSelectedSize(sizeObj.size)}
                 className={`
                   py-3 text-xs font-bold font-sans border transition-all
-                  ${isOutOfStock 
-                      ? 'border-[#EAE4DD] text-[#6B4F3B]/30 cursor-not-allowed bg-[#FDFBF7]/50 line-through' 
+                  ${
+                    isOutOfStock
+                      ? "border-[#EAE4DD] text-[#6B4F3B]/30 cursor-not-allowed bg-[#FDFBF7]/50 line-through"
                       : isSelected
-                        ? 'border-[#4A3525] bg-[#4A3525] text-white'
-                        : 'border-[#EAE4DD] text-[#4A3525] hover:border-[#6B4F3B] bg-white'
+                        ? "border-[#4A3525] bg-[#4A3525] text-white"
+                        : "border-[#EAE4DD] text-[#4A3525] hover:border-[#6B4F3B] bg-white"
                   }
                 `}
               >
@@ -104,23 +105,23 @@ export function ProductInfo({ product }) {
 
       {/* Action Buttons */}
       <div className="flex flex-col gap-4 mb-12">
-        <button 
+        <button
           onClick={handleAddToCart}
           className="w-full bg-[#C89B3C] text-white font-bold font-sans py-4 rounded hover:bg-[#B38A34] transition-colors shadow-sm flex items-center justify-center gap-2"
         >
           <ShoppingBag size={18} />
           Add to Bag
         </button>
-        <button 
+        <button
           onClick={handleToggleWishlist}
           className={`w-full bg-white border font-bold font-sans py-4 rounded transition-colors flex items-center justify-center gap-2 ${
-            isWishlisted 
-              ? 'border-[#A4550A] text-[#A4550A]' 
-              : 'border-[#EAE4DD] text-[#4A3525] hover:border-[#6B4F3B]'
+            isWishlisted
+              ? "border-[#A4550A] text-[#A4550A]"
+              : "border-[#EAE4DD] text-[#4A3525] hover:border-[#6B4F3B]"
           }`}
         >
-          <Heart size={18} className={isWishlisted ? 'fill-current' : ''} />
-          {isWishlisted ? 'Added to Wishlist' : 'Add to Wishlist'}
+          <Heart size={18} className={isWishlisted ? "fill-current" : ""} />
+          {isWishlisted ? "Added to Wishlist" : "Add to Wishlist"}
         </button>
       </div>
 
@@ -128,15 +129,21 @@ export function ProductInfo({ product }) {
       <div className="grid grid-cols-3 gap-4 py-8 border-t border-[#F5F0E6]">
         <div className="flex flex-col items-center justify-center text-center gap-2">
           <Leaf size={24} className="text-[#A4550A]" strokeWidth={1.5} />
-          <span className="text-[10px] font-bold font-sans text-[#6B4F3B] uppercase tracking-wider">100% Organic</span>
+          <span className="text-[10px] font-bold font-sans text-[#6B4F3B] uppercase tracking-wider">
+            100% Organic
+          </span>
         </div>
         <div className="flex flex-col items-center justify-center text-center gap-2">
           <Truck size={24} className="text-[#A4550A]" strokeWidth={1.5} />
-          <span className="text-[10px] font-bold font-sans text-[#6B4F3B] uppercase tracking-wider">Free Shipping</span>
+          <span className="text-[10px] font-bold font-sans text-[#6B4F3B] uppercase tracking-wider">
+            Free Shipping
+          </span>
         </div>
         <div className="flex flex-col items-center justify-center text-center gap-2">
           <ShieldCheck size={24} className="text-[#A4550A]" strokeWidth={1.5} />
-          <span className="text-[10px] font-bold font-sans text-[#6B4F3B] uppercase tracking-wider">Ethical</span>
+          <span className="text-[10px] font-bold font-sans text-[#6B4F3B] uppercase tracking-wider">
+            Ethical
+          </span>
         </div>
       </div>
     </div>

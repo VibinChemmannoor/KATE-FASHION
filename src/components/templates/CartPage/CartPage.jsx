@@ -32,10 +32,38 @@ const INITIAL_CART = [
 ];
 
 const SIMILAR_ITEMS = [
-  { id: 1, name: "Design 1", brand: "KATERI", price: 500.0, bgColor: "bg-[#F2F2F2]", imageAlt: "Minimal Tube" },
-  { id: 2, name: "Designers", brand: "NEW", price: 1000.0, bgColor: "bg-[#E6E6E6]", imageAlt: "Woman in Sweater" },
-  { id: 3, name: "Dress Blue", brand: "TIARA", price: 400.0, bgColor: "bg-[#F2F2F2]", imageAlt: "Yellow Label Jar" },
-  { id: 4, name: "Designeds", brand: "NEW", price: 2500.0, bgColor: "bg-[#D2DBD8]", imageAlt: "Woman holding paper" },
+  {
+    id: 1,
+    name: "Design 1",
+    brand: "KATERI",
+    price: 500.0,
+    bgColor: "bg-[#F2F2F2]",
+    imageAlt: "Minimal Tube",
+  },
+  {
+    id: 2,
+    name: "Designers",
+    brand: "NEW",
+    price: 1000.0,
+    bgColor: "bg-[#E6E6E6]",
+    imageAlt: "Woman in Sweater",
+  },
+  {
+    id: 3,
+    name: "Dress Blue",
+    brand: "TIARA",
+    price: 400.0,
+    bgColor: "bg-[#F2F2F2]",
+    imageAlt: "Yellow Label Jar",
+  },
+  {
+    id: 4,
+    name: "Designeds",
+    brand: "NEW",
+    price: 2500.0,
+    bgColor: "bg-[#D2DBD8]",
+    imageAlt: "Woman holding paper",
+  },
 ];
 
 export function CartPage() {
@@ -49,7 +77,9 @@ export function CartPage() {
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   const handleUpdateQuantity = (id, newQuantity) => {
-    setCartItems((prev) => prev.map((item) => (item.id === id ? { ...item, quantity: newQuantity } : item)));
+    setCartItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, quantity: newQuantity } : item))
+    );
   };
 
   const handleDelete = (id) => {
@@ -76,7 +106,8 @@ export function CartPage() {
         </div>
 
         <h1 className="text-3xl font-bold font-serif text-[#1a1b26] mb-10 flex items-baseline gap-2">
-          Cart Items <span className="text-xl text-[#6B4F3B]/50 font-normal">({cartItems.length} Items)</span>
+          Cart Items{" "}
+          <span className="text-xl text-[#6B4F3B]/50 font-normal">({cartItems.length} Items)</span>
         </h1>
 
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 relative">
@@ -140,9 +171,13 @@ export function CartPage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {SIMILAR_ITEMS.map((item) => (
               <div key={item.id} className="group cursor-pointer flex flex-col">
-                <div className={`relative w-full aspect-[3/4] rounded-xl overflow-hidden mb-4 ${item.bgColor}`}>
+                <div
+                  className={`relative w-full aspect-[3/4] rounded-xl overflow-hidden mb-4 ${item.bgColor}`}
+                >
                   <div className="absolute inset-0 flex items-center justify-center p-4">
-                    <span className="text-[#6B4F3B]/30 font-serif italic text-sm text-center">{item.imageAlt}</span>
+                    <span className="text-[#6B4F3B]/30 font-serif italic text-sm text-center">
+                      {item.imageAlt}
+                    </span>
                   </div>
                 </div>
 

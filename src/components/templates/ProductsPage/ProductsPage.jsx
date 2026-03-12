@@ -50,7 +50,8 @@ export function ProductsPage() {
             All Products
           </h1>
           <p className="text-base font-sans text-[#6B4F3B]/80 leading-relaxed max-w-xl">
-            Explore our complete collection of meticulously crafted, organic cotton garments designed for the next generation.
+            Explore our complete collection of meticulously crafted, organic cotton garments
+            designed for the next generation.
           </p>
         </div>
 

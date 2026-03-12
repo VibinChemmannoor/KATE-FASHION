@@ -1,1 +1,1 @@
-export { CategoryShowcase } from './CategoryShowcase';
+export { CategoryShowcase } from "./CategoryShowcase";

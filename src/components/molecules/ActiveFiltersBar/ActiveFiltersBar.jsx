@@ -1,17 +1,17 @@
-import { X } from 'lucide-react';
+import { X } from "lucide-react";
 
 export function ActiveFiltersBar({ filters, onRemoveFilter }) {
   // Flatten all active filters into a single array of objects { category, value }
   const activeFilters = [];
-  
+
   if (filters.sizes) {
-    filters.sizes.forEach(size => activeFilters.push({ category: 'sizes', value: size }));
+    filters.sizes.forEach((size) => activeFilters.push({ category: "sizes", value: size }));
   }
   if (filters.colors) {
-    filters.colors.forEach(col => activeFilters.push({ category: 'colors', value: col }));
+    filters.colors.forEach((col) => activeFilters.push({ category: "colors", value: col }));
   }
   if (filters.materials) {
-    filters.materials.forEach(mat => activeFilters.push({ category: 'materials', value: mat }));
+    filters.materials.forEach((mat) => activeFilters.push({ category: "materials", value: mat }));
   }
 
   if (activeFilters.length === 0) return null;
