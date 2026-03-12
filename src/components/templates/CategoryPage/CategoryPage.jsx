@@ -41,11 +41,11 @@ export function CategoryPage() {
           <Link href="/" className="hover:text-[#EC7F13] transition-colors">
             HOME
           </Link>
-          <span className="mx-2">></span>
+          <span className="mx-2"></span>
           <Link href="/collections" className="hover:text-[#EC7F13] transition-colors">
             COLLECTIONS
           </Link>
-          <span className="mx-2">></span>
+          <span className="mx-2"></span>
           <span className="text-[#1a1b26]">NEWBORN ESSENTIALS</span>
         </div>
 
@@ -54,7 +54,8 @@ export function CategoryPage() {
             Newborn Essentials
           </h1>
           <p className="text-base font-sans text-[#6B4F3B]/80 leading-relaxed max-w-xl">
-            Discover our curated collection of organic cotton pieces. Thoughtfully designed in earthy tones of brown, caramel, and beige for the ultimate soft-touch experience.
+            Discover our curated collection of organic cotton pieces. Thoughtfully designed in
+            earthy tones of brown, caramel, and beige for the ultimate soft-touch experience.
           </p>
         </div>
 
