@@ -1,8 +1,25 @@
-import { Plus, Home, Edit2, Truck } from "lucide-react";
+"use client";
 
-export function AddressSelector({ addresses, onAddNew, onProceedToPayment }) {
-  // Assume the first address is selected for this mock
-  const selectedId = addresses.length > 0 ? addresses[0].id : null;
+import { Plus, Home, Briefcase, MapPin, Edit2, Truck } from "lucide-react";
+
+export function AddressSelector({
+  addresses,
+  selectedId,
+  onSelect,
+  onAddNew,
+  deliveryType = "standard",
+  onDeliveryTypeChange,
+}) {
+  const getLabelIcon = (label) => {
+    switch (label) {
+      case "work":
+        return <Briefcase size={18} />;
+      case "other":
+        return <MapPin size={18} />;
+      default:
+        return <Home size={18} />;
+    }
+  };
 
   return (
     <div className="w-full">
@@ -15,13 +32,13 @@ export function AddressSelector({ addresses, onAddNew, onProceedToPayment }) {
 
       {/* Address Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-        {/* Saved Addresses */}
         {addresses.map((addr) => {
           const isSelected = addr.id === selectedId;
           return (
             <div
               key={addr.id}
-              className={`relative border-2 rounded-xl p-6 transition-all ${
+              onClick={() => onSelect(addr.id)}
+              className={`relative border-2 rounded-xl p-6 transition-all cursor-pointer ${
                 isSelected
                   ? "border-[#EF831D] bg-white"
                   : "border-[#EAE4DD] bg-[#FAF9F6] hover:border-[#D47112]/50"
@@ -30,14 +47,14 @@ export function AddressSelector({ addresses, onAddNew, onProceedToPayment }) {
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-[#FDF0DF] text-[#EF831D] flex items-center justify-center shrink-0">
-                    <Home size={18} />
+                    {getLabelIcon(addr.label)}
                   </div>
                   <div>
                     <h3 className="text-base font-bold font-sans text-[#4A3525] leading-tight">
                       {addr.fullName}
                     </h3>
                     <p className="text-xs font-bold text-[#6B4F3B]/60 uppercase tracking-widest mt-1">
-                      Home Address
+                      {addr.label || "Home"} Address
                     </p>
                   </div>
                 </div>
@@ -51,19 +68,19 @@ export function AddressSelector({ addresses, onAddNew, onProceedToPayment }) {
               <div className="text-sm font-sans text-[#6B4F3B] leading-relaxed mb-6 ml-13">
                 <p>{addr.street}</p>
                 <p>
-                  {addr.town}, {addr.pincode}
+                  {addr.city}
+                  {addr.state ? `, ${addr.state}` : ""} - {addr.pincode}
                 </p>
-                <p className="mt-2 flex items-center gap-2">📞 {addr.phone}</p>
+                <p className="mt-2 flex items-center gap-2">
+                  <span>+91 {addr.phone}</span>
+                </p>
               </div>
 
               {isSelected && (
-                <div className="flex items-center gap-3 mt-auto">
-                  <button className="flex-1 bg-[#EF831D] hover:bg-[#D47112] text-white font-bold text-sm tracking-wider py-3 rounded transition-colors shadow-sm">
-                    Deliver Here
-                  </button>
-                  <button className="w-11 h-11 border border-[#EAE4DD] rounded flex items-center justify-center text-[#6B4F3B] hover:text-[#EF831D] hover:border-[#EF831D] transition-colors">
-                    <Edit2 size={16} />
-                  </button>
+                <div className="absolute top-4 right-4 w-6 h-6 bg-[#EF831D] rounded-full flex items-center justify-center">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
                 </div>
               )}
             </div>
@@ -73,7 +90,7 @@ export function AddressSelector({ addresses, onAddNew, onProceedToPayment }) {
         {/* Add New Address Card */}
         <button
           onClick={onAddNew}
-          className="flex flex-col items-center justify-center gap-4 border-2 border-dashed border-[#EAE4DD] rounded-xl p-8 hover:bg-[#FAF9F6] hover:border-[#D47112]/50 transition-all text-center min-h-[280px]"
+          className="flex flex-col items-center justify-center gap-4 border-2 border-dashed border-[#EAE4DD] rounded-xl p-8 hover:bg-[#FAF9F6] hover:border-[#D47112]/50 transition-all text-center min-h-[220px]"
         >
           <div className="w-12 h-12 rounded-full bg-white border border-[#EAE4DD] flex items-center justify-center text-[#6B4F3B] shadow-sm">
             <Plus size={20} />
@@ -95,15 +112,35 @@ export function AddressSelector({ addresses, onAddNew, onProceedToPayment }) {
         Delivery Preferences
       </h3>
       <div className="bg-[#FAF9F6] border border-[#EAE4DD] rounded-xl p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Standard */}
-        <div className="border border-[#EF831D] bg-white rounded-lg p-4 cursor-pointer">
-          <p className="text-sm font-bold font-sans text-[#4A3525] mb-1">Standard Delivery</p>
-          <p className="text-xs font-sans text-[#6B4F3B]/60">3-5 Business Days • Free</p>
+        <div
+          onClick={() => onDeliveryTypeChange?.("standard")}
+          className={`border rounded-lg p-4 cursor-pointer transition-colors ${
+            deliveryType === "standard"
+              ? "border-[#EF831D] bg-white"
+              : "border-[#EAE4DD] bg-white hover:border-[#D47112]/30"
+          }`}
+        >
+          <p className="text-sm font-bold font-sans text-[#4A3525] mb-1">
+            Standard Delivery
+          </p>
+          <p className="text-xs font-sans text-[#6B4F3B]/60">
+            5-7 Business Days
+          </p>
         </div>
-        {/* Express */}
-        <div className="border border-[#EAE4DD] bg-white rounded-lg p-4 cursor-pointer hover:border-[#D47112]/30 transition-colors">
-          <p className="text-sm font-bold font-sans text-[#4A3525] mb-1">Express Delivery</p>
-          <p className="text-xs font-sans text-[#6B4F3B]/60">Next Day • $12.99</p>
+        <div
+          onClick={() => onDeliveryTypeChange?.("express")}
+          className={`border rounded-lg p-4 cursor-pointer transition-colors ${
+            deliveryType === "express"
+              ? "border-[#EF831D] bg-white"
+              : "border-[#EAE4DD] bg-white hover:border-[#D47112]/30"
+          }`}
+        >
+          <p className="text-sm font-bold font-sans text-[#4A3525] mb-1">
+            Express Delivery
+          </p>
+          <p className="text-xs font-sans text-[#6B4F3B]/60">
+            2-3 Business Days
+          </p>
         </div>
       </div>
     </div>

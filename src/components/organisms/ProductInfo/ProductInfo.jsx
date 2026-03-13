@@ -2,24 +2,54 @@
 
 import { useState } from "react";
 import { Heart, ShoppingBag, ShieldCheck, Truck, Leaf } from "lucide-react";
+import { useCartStore } from "@/store/cartStore";
+import { useWishlistStore } from "@/store/wishlistStore";
+import { useUiStore } from "@/store/uiStore";
 
 export function ProductInfo({ product }) {
-  const [selectedColor, setSelectedColor] = useState(product.colors[0].name);
+  const [selectedColor, setSelectedColor] = useState(product.colors?.[0]?.name || "");
   const [selectedSize, setSelectedSize] = useState("");
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
-  // Example functionality logs
-  const handleAddToCart = () => {
+  const addItem = useCartStore((state) => state.addItem);
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlistStore();
+  const showToast = useUiStore((state) => state.showToast);
+
+  const isWishlisted = product.id ? isInWishlist(product.id) : false;
+
+  const handleAddToCart = async () => {
     if (!selectedSize) {
-      alert("Please select a size first.");
+      showToast("Please select a size first", "error");
       return;
     }
-    console.log(`Added ${product.name} (${selectedColor}, ${selectedSize}) to bag`);
+    setIsAddingToCart(true);
+    try {
+      await addItem({
+        productId: product.id,
+        quantity: 1,
+        size: selectedSize,
+        color: selectedColor,
+      });
+      showToast("Added to bag!", "success");
+    } catch (err) {
+      showToast(err.message || "Failed to add to bag", "error");
+    } finally {
+      setIsAddingToCart(false);
+    }
   };
 
-  const handleToggleWishlist = () => {
-    setIsWishlisted(!isWishlisted);
-    console.log(`${isWishlisted ? "Removed from" : "Added to"} wishlist: ${product.name}`);
+  const handleToggleWishlist = async () => {
+    try {
+      if (isWishlisted) {
+        await removeFromWishlist(product.id);
+        showToast("Removed from wishlist", "success");
+      } else {
+        await addToWishlist(product.id);
+        showToast("Added to wishlist!", "success");
+      }
+    } catch {
+      showToast("Please login to use wishlist", "error");
+    }
   };
 
   return (
@@ -107,10 +137,11 @@ export function ProductInfo({ product }) {
       <div className="flex flex-col gap-4 mb-12">
         <button
           onClick={handleAddToCart}
-          className="w-full bg-[#C89B3C] text-white font-bold font-sans py-4 rounded hover:bg-[#B38A34] transition-colors shadow-sm flex items-center justify-center gap-2"
+          disabled={isAddingToCart}
+          className="w-full bg-[#C89B3C] text-white font-bold font-sans py-4 rounded hover:bg-[#B38A34] transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-60"
         >
           <ShoppingBag size={18} />
-          Add to Bag
+          {isAddingToCart ? "Adding..." : "Add to Bag"}
         </button>
         <button
           onClick={handleToggleWishlist}

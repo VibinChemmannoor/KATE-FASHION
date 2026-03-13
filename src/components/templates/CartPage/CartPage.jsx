@@ -1,98 +1,66 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 import { CartItem } from "@/components/molecules/CartItem";
 import { PriceDetails } from "@/components/molecules/PriceDetails";
-
-const INITIAL_CART = [
-  {
-    id: 1,
-    name: "Elegant brown girl dress",
-    color: "Brown",
-    size: "0-6 months",
-    price: 500.0,
-    quantity: 1,
-    bgColor: "bg-[#5C7F59]",
-    imageAlt: "Green Bottle Product",
-  },
-  {
-    id: 2,
-    name: "Blue coat design",
-    color: "Light Blue",
-    size: "1-2 years",
-    price: 500.0,
-    quantity: 2,
-    bgColor: "bg-[#99A891]",
-    imageAlt: "White Bottle Product",
-  },
-];
-
-const SIMILAR_ITEMS = [
-  {
-    id: 1,
-    name: "Design 1",
-    brand: "KATERI",
-    price: 500.0,
-    bgColor: "bg-[#F2F2F2]",
-    imageAlt: "Minimal Tube",
-  },
-  {
-    id: 2,
-    name: "Designers",
-    brand: "NEW",
-    price: 1000.0,
-    bgColor: "bg-[#E6E6E6]",
-    imageAlt: "Woman in Sweater",
-  },
-  {
-    id: 3,
-    name: "Dress Blue",
-    brand: "TIARA",
-    price: 400.0,
-    bgColor: "bg-[#F2F2F2]",
-    imageAlt: "Yellow Label Jar",
-  },
-  {
-    id: 4,
-    name: "Designeds",
-    brand: "NEW",
-    price: 2500.0,
-    bgColor: "bg-[#D2DBD8]",
-    imageAlt: "Woman holding paper",
-  },
-];
+import { useCart } from "@/hooks/useCart";
+import { useWishlistStore } from "@/store/wishlistStore";
+import { useAuthStore } from "@/store/authStore";
 
 export function CartPage() {
   const router = useRouter();
-  const [cartItems, setCartItems] = useState(INITIAL_CART);
+  const {
+    items,
+    total,
+    itemCount,
+    shippingFee,
+    isLoading,
+    updateQuantity,
+    removeItem,
+    refreshCart,
+  } = useCart();
 
-  const deliveryFee = 100;
-  const discountAmount = 50;
+  const { addToWishlist } = useWishlistStore();
+  const { isAuthenticated } = useAuthStore();
 
-  const orderValue = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  useEffect(() => {
+    if (isAuthenticated) {
+      refreshCart();
+    }
+  }, [isAuthenticated, refreshCart]);
 
-  const handleUpdateQuantity = (id, newQuantity) => {
-    setCartItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, quantity: newQuantity } : item))
-    );
+  const handleUpdateQuantity = (productId, newQuantity) => {
+    if (newQuantity < 1) return;
+    updateQuantity(productId, newQuantity);
   };
 
-  const handleDelete = (id) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  const handleDelete = (productId) => {
+    removeItem(productId);
   };
 
-  const handleFavorite = (id) => {
-    console.log("Saved item to wishlist:", id);
+  const handleFavorite = async (productId) => {
+    try {
+      await addToWishlist(productId);
+    } catch {
+      // silently fail if not logged in
+    }
   };
 
   const handleProceedToCheckout = () => {
     router.push("/checkout");
   };
+
+  if (isLoading && items.length === 0) {
+    return (
+      <div className="bg-white min-h-screen flex items-center justify-center">
+        <Loader2 size={32} className="animate-spin text-[#6B4F3B]" />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white min-h-screen">
@@ -107,18 +75,20 @@ export function CartPage() {
 
         <h1 className="text-3xl font-bold font-serif text-[#1a1b26] mb-10 flex items-baseline gap-2">
           Cart Items{" "}
-          <span className="text-xl text-[#6B4F3B]/50 font-normal">({cartItems.length} Items)</span>
+          <span className="text-xl text-[#6B4F3B]/50 font-normal">
+            ({itemCount} {itemCount === 1 ? "Item" : "Items"})
+          </span>
         </h1>
 
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 relative">
           <div className="flex-1">
-            {cartItems.length === 0 ? (
+            {items.length === 0 ? (
               <div className="py-12 border border-dashed border-[#EAE4DD] rounded-xl text-center">
                 <p className="text-[#6B4F3B]/70 mb-4 font-sans max-w-md mx-auto">
                   Your shopping cart is empty. Add items to proceed.
                 </p>
                 <Link
-                  href="/collections"
+                  href="/products"
                   className="inline-block bg-[#1a1b26] text-white px-8 py-3 rounded text-sm font-bold tracking-wider hover:bg-[#4A3525] transition-colors"
                 >
                   BROWSE STORE
@@ -126,10 +96,19 @@ export function CartPage() {
               </div>
             ) : (
               <div className="flex flex-col border-t border-[#F5F0E6]">
-                {cartItems.map((item) => (
+                {items.map((item) => (
                   <CartItem
                     key={item.id}
-                    item={item}
+                    item={{
+                      id: item.product.id,
+                      name: item.product.name,
+                      color: item.color,
+                      size: item.size,
+                      price: item.price,
+                      quantity: item.quantity,
+                      image: item.product.image,
+                      badge: item.product.badge,
+                    }}
                     onUpdateQuantity={handleUpdateQuantity}
                     onDelete={handleDelete}
                     onFavorite={handleFavorite}
@@ -139,58 +118,20 @@ export function CartPage() {
             )}
           </div>
 
-          {cartItems.length > 0 && (
+          {items.length > 0 && (
             <div className="w-full lg:w-[400px] flex-shrink-0">
               <PriceDetails
-                orderValue={orderValue}
-                deliveryFee={deliveryFee}
-                discount={discountAmount}
-                totalItems={totalItems}
+                orderValue={total}
+                deliveryFee={shippingFee}
+                discount={0}
+                totalItems={itemCount}
                 onPrimaryAction={handleProceedToCheckout}
                 primaryActionText="CONTINUE TO CHECKOUT"
-                showSignIn={true}
+                showSignIn={!isAuthenticated}
                 isCheckoutPage={false}
               />
             </div>
           )}
-        </div>
-
-        <div className="mt-24 mb-16 border-t border-[#F5F0E6] pt-16">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl font-bold font-serif text-[#1a1b26]">Similar Items</h2>
-            <div className="flex gap-2">
-              <button className="w-10 h-10 rounded-full border border-[#EAE4DD] flex items-center justify-center text-[#6B4F3B] hover:border-[#1a1b26] hover:text-[#1a1b26] transition-colors bg-white">
-                <ChevronLeft size={18} />
-              </button>
-              <button className="w-10 h-10 rounded-full border border-[#EAE4DD] flex items-center justify-center text-[#6B4F3B] hover:border-[#1a1b26] hover:text-[#1a1b26] transition-colors bg-white">
-                <ChevronRight size={18} />
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {SIMILAR_ITEMS.map((item) => (
-              <div key={item.id} className="group cursor-pointer flex flex-col">
-                <div
-                  className={`relative w-full aspect-[3/4] rounded-xl overflow-hidden mb-4 ${item.bgColor}`}
-                >
-                  <div className="absolute inset-0 flex items-center justify-center p-4">
-                    <span className="text-[#6B4F3B]/30 font-serif italic text-sm text-center">
-                      {item.imageAlt}
-                    </span>
-                  </div>
-                </div>
-
-                <span className="text-[10px] font-bold tracking-[0.2em] text-[#D47112] uppercase mb-1">
-                  {item.brand}
-                </span>
-                <h3 className="text-sm font-bold font-sans text-[#4A3525] group-hover:text-[#D47112] transition-colors mb-1">
-                  {item.name}
-                </h3>
-                <p className="text-sm font-bold font-serif text-[#1a1b26]">INR {item.price}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </div>
