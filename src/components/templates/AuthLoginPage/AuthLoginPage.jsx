@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Eye, EyeOff, Lock, X } from "lucide-react";
 import useAuthLogin from "./useAuthLogin";
 
@@ -25,7 +24,12 @@ const GoogleIcon = () => (
   </svg>
 );
 
-export function AuthLoginPage({ isOpen = true, onClose = () => {} }) {
+export function AuthLoginPage({
+  isOpen = true,
+  onClose = () => {},
+  onSuccess,
+  onSwitchToRegister,
+}) {
   const {
     formik,
     showPassword,
@@ -34,7 +38,7 @@ export function AuthLoginPage({ isOpen = true, onClose = () => {} }) {
     submitError,
     setShowPassword,
     getInputBorderClass,
-  } = useAuthLogin();
+  } = useAuthLogin({ onSuccess });
 
   if (!isOpen) return null;
 
@@ -184,9 +188,13 @@ export function AuthLoginPage({ isOpen = true, onClose = () => {} }) {
 
           <p className="mt-6 text-center text-sm text-[#9E8475]">
             Don&apos;t have an account?{" "}
-            <Link href="/register" className="font-medium hover:underline text-[#C28A5A]">
+            <button
+              type="button"
+              onClick={onSwitchToRegister}
+              className="font-medium hover:underline text-[#C28A5A]"
+            >
               Create an account
-            </Link>
+            </button>
           </p>
         </div>
       </div>

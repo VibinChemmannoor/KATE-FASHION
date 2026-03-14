@@ -1,11 +1,10 @@
-import React from "react";
 import { PASSWORD_MIN } from "@/lib/utils/constants";
 import * as Yup from "yup";
 import { encryptPassword } from "@/lib/security/clientEncrypt";
 import { useState } from "react";
 import { useFormik } from "formik";
 
-const useAuthLogin = () => {
+const useAuthLogin = ({ onSuccess } = {}) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -54,6 +53,7 @@ const useAuthLogin = () => {
           return;
         }
         setSubmitSuccess(true);
+        if (onSuccess) onSuccess(data?.data);
       } catch (error) {
         setSubmitError("Unable to sign in");
       } finally {

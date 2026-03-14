@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import Link from "next/link";
 import { Eye, EyeOff, X, ArrowRight } from "lucide-react";
 import { encryptPassword } from "@/lib/security/clientEncrypt";
 import { BABY_NAME_MAX, PASSWORD_MIN, USERNAME_MIN, USERNAME_MAX } from "@/lib/utils/constants";
@@ -109,7 +108,12 @@ function PasswordField({ id, label, formik }) {
   );
 }
 
-export function AuthRegisterPage({ isOpen = true, onClose = () => {} }) {
+export function AuthRegisterPage({
+  isOpen = true,
+  onClose = () => {},
+  onRegistered,
+  onSwitchToLogin,
+}) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -153,6 +157,7 @@ export function AuthRegisterPage({ isOpen = true, onClose = () => {} }) {
         }
         setSubmitSuccess(true);
         resetForm();
+        if (onRegistered) onRegistered();
       } catch (error) {
         setSubmitError("Unable to create account");
       } finally {
@@ -279,9 +284,13 @@ export function AuthRegisterPage({ isOpen = true, onClose = () => {} }) {
 
           <p className="mt-5 text-center text-sm text-[#9E8475]">
             Already have an account?{" "}
-            <Link href="/login" className="font-medium hover:underline text-[#C28A5A]">
+            <button
+              type="button"
+              onClick={onSwitchToLogin}
+              className="font-medium hover:underline text-[#C28A5A]"
+            >
               Sign in
-            </Link>
+            </button>
           </p>
         </div>
       </div>
