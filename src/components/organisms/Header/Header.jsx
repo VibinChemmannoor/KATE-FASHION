@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Search, User, Heart, ShoppingBag, Menu, X, LogOut, UserRound } from "lucide-react";
 
@@ -12,6 +13,7 @@ import { useAuthStore } from "@/store/authStore";
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [authModal, setAuthModal] = useState(null);
+  const router = useRouter();
   const itemCount = useCartStore((state) => state.itemCount);
   const { isAuthenticated, user, logout, fetchUser, setUser } = useAuthStore();
 
@@ -35,6 +37,14 @@ export function Header() {
 
   const handleRegisterSuccess = () => {
     setAuthModal("login");
+  };
+
+  const handleWishlistClick = () => {
+    if (!isAuthenticated) {
+      openLoginModal();
+      return;
+    }
+    router.push("/wishlist");
   };
 
   return (
@@ -130,13 +140,14 @@ export function Header() {
             </button>
           )}
 
-          <Link
-            href="/wishlist"
+          <button
+            type="button"
             aria-label="Wishlist"
+            onClick={handleWishlistClick}
             className="hover:text-[#EC7F13] transition-colors"
           >
             <Heart size={22} strokeWidth={1.5} />
-          </Link>
+          </button>
 
           <Link href="/cart" aria-label="Cart" className="relative hover:text-[#EC7F13] transition-colors">
             <ShoppingBag size={22} strokeWidth={1.5} />
@@ -180,6 +191,18 @@ export function Header() {
             >
               NEWBORN
             </Link>
+            {!isAuthenticated && (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  openLoginModal();
+                }}
+                className="mt-3 w-full rounded-full bg-[#C28A5A] px-5 py-3 text-sm font-semibold tracking-wide text-white shadow-[0_4px_14px_rgba(194,138,90,0.35)] transition-colors hover:bg-[#B07848]"
+              >
+                Sign In
+              </button>
+            )}
           </nav>
         </div>
       )}
