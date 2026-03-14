@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 import { FilterSidebar } from "@/components/organisms/FilterSidebar";
@@ -8,7 +8,13 @@ import { ActiveFiltersBar } from "@/components/molecules/ActiveFiltersBar";
 import { ProductGrid } from "@/components/organisms/ProductGrid";
 import { SortDropdown } from "@/components/molecules/SortDropdown";
 
-export function ProductsPage() {
+/**
+ * @param {{
+ *  initialProducts?: Array<any>,
+ *  initialPagination?: { page: number, limit: number, total: number, totalPages: number, hasMore: boolean }
+ * }} props
+ */
+export function ProductsPage({ initialProducts = [], initialPagination = null }) {
   const [filters, setFilters] = useState({
     sizes: [],
     colors: [],
@@ -16,6 +22,7 @@ export function ProductsPage() {
   });
 
   const [sortOption, setSortOption] = useState("Most Popular");
+  const [productCount, setProductCount] = useState(initialPagination?.total || 0);
 
   const handleFilterChange = (category, value) => {
     setFilters((prev) => {
@@ -33,6 +40,12 @@ export function ProductsPage() {
       [category]: prev[category].filter((item) => item !== value),
     }));
   };
+
+  useEffect(() => {
+    if (initialPagination?.total) {
+      setProductCount(initialPagination.total);
+    }
+  }, [initialPagination]);
 
   return (
     <div className="bg-[#FDFBF7] min-h-screen">
@@ -61,7 +74,7 @@ export function ProductsPage() {
           </div>
           <div className="flex items-center gap-6 self-end w-full md:w-auto justify-between md:justify-end">
             <span className="text-xs font-bold text-[#D47112] bg-[#FDF0DF] px-3 py-1.5 rounded uppercase tracking-wider">
-              84 Products Found
+              {productCount} Products Found
             </span>
             <SortDropdown value={sortOption} onChange={setSortOption} />
           </div>
@@ -69,7 +82,13 @@ export function ProductsPage() {
 
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
           <FilterSidebar filters={filters} onFilterChange={handleFilterChange} />
-          <ProductGrid activeFilters={filters} sortOption={sortOption} />
+          <ProductGrid
+            activeFilters={filters}
+            sortOption={sortOption}
+            initialProducts={initialProducts}
+            initialPagination={initialPagination}
+            onMetaChange={({ total }) => setProductCount(total)}
+          />
         </div>
       </div>
     </div>

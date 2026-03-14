@@ -4,29 +4,6 @@ import { CategoryShowcase } from "@/components/organisms/CategoryShowcase";
 
 export const revalidate = 3600;
 
-const FALLBACK_HOME_CONTENT = {
-  hero: {
-    collectionLabel: "Summer Collection 2024",
-    titleLines: ["Softness for", "tiny", "miracles."],
-    subtitle: "Handcrafted from 100% GOTS certified organic cotton for your baby's delicate skin.",
-    ctaLabel: "Shop Collection",
-    ctaHref: "/collections/summer-2024",
-    primaryImageAlt: "Baby illustration",
-    secondaryImageAlt: "Hanging clothes image",
-  },
-  newArrivals: {
-    title: "New Arrivals",
-    ctaLabel: "View All Arrivals",
-    ctaHref: "/collections/new-arrivals",
-    items: [],
-  },
-  categories: {
-    title: "Shop by Category",
-    subtitle: "Thoughtfully curated for every milestone",
-    items: [],
-  },
-};
-
 /**
  * @returns {Promise<import("next").Metadata>}
  */
@@ -51,7 +28,7 @@ async function getHomeContent() {
 }
 
 export default async function HomePage() {
-  const content = (await getHomeContent()) || FALLBACK_HOME_CONTENT;
+  const content = (await getHomeContent());
 
   return (
     <div className="flex flex-col gap-8 md:gap-16 pb-16">

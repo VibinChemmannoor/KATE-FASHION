@@ -13,7 +13,7 @@ export function ProductDetailsTabs({ materialInfo, sizeChart }) {
           <ul className="space-y-3">
             {materialInfo.bullets.map((bullet, idx) => (
               <li key={idx} className="flex items-start gap-3 text-sm font-sans text-[#4A3525]">
-                <span className="text-[#C89B3C] mt-1">•</span>
+                <span className="text-[#C89B3C] mt-1">*</span>
                 <span>{bullet}</span>
               </li>
             ))}

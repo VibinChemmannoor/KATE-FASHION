@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { rateLimit } from "@/lib/security/rateLimit";
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { HomeContent } from "@/lib/db/models/HomeContent";
+import { Category } from "@/lib/db/models/Category";
 import { HOME_RATE_LIMIT_MAX, HOME_RATE_LIMIT_WINDOW } from "@/lib/utils/constants";
 
 const DEFAULT_HOME_CONTENT = {
@@ -11,14 +12,16 @@ const DEFAULT_HOME_CONTENT = {
     titleLines: ["Softness for", "tiny", "miracles."],
     subtitle: "Handcrafted from 100% GOTS certified organic cotton for your baby's delicate skin.",
     ctaLabel: "Shop Collection",
-    ctaHref: "/collections/summer-2024",
+    ctaHref: "/products",
     primaryImageAlt: "Baby illustration",
     secondaryImageAlt: "Hanging clothes image",
+    image: "/Assets/banner-image1.jpg",
+    hangingImage: "/Assets/hanging-dress1.jpg",
   },
   newArrivals: {
     title: "New Arrivals",
     ctaLabel: "View All Arrivals",
-    ctaHref: "/collections/new-arrivals",
+    ctaHref: "/products",
     items: [
       {
         id: 1,
@@ -28,6 +31,7 @@ const DEFAULT_HOME_CONTENT = {
         isNew: true,
         bgColor: "bg-[#D29E74]",
         imageAlt: "New arrival 1",
+        image: "/Assets/image5.jpg",
       },
       {
         id: 2,
@@ -37,6 +41,7 @@ const DEFAULT_HOME_CONTENT = {
         isNew: false,
         bgColor: "bg-[#ff8a3d]",
         imageAlt: "New arrival 2",
+        image: "/Assets/image2.jpg",
       },
       {
         id: 3,
@@ -46,6 +51,7 @@ const DEFAULT_HOME_CONTENT = {
         isNew: false,
         bgColor: "bg-[#181818]",
         imageAlt: "New arrival 3",
+        image: "/Assets/image3.jpg",
       },
       {
         id: 4,
@@ -55,6 +61,7 @@ const DEFAULT_HOME_CONTENT = {
         isNew: false,
         bgColor: "bg-[#e7e7e7]",
         imageAlt: "New arrival 4",
+        image: "/Assets/image4.jpg",
       },
     ],
   },
@@ -70,6 +77,7 @@ const DEFAULT_HOME_CONTENT = {
         bgColor: "bg-[#3A3C38]",
         textAlign: "left",
         imageAlt: "Artisan workshop image",
+        image: "/Assets/banner-image2.jpg",
       },
       {
         id: 2,
@@ -79,10 +87,13 @@ const DEFAULT_HOME_CONTENT = {
         bgColor: "bg-[#C8A488]",
         textAlign: "center",
         imageAlt: "Newborn vector image",
+        image: "/Assets/banner-image3.jpg",
       },
     ],
   },
 };
+
+const CATEGORY_BG_COLORS = ["bg-[#3A3C38]", "bg-[#C8A488]", "bg-[#8D9E83]", "bg-[#A2B59D]"];
 
 /**
  * @param {Request} request
@@ -97,8 +108,31 @@ export async function GET(request) {
 
     await connectToDatabase();
     const content = await HomeContent.findOne().sort({ updatedAt: -1 }).lean();
+    const categories = await Category.find({ isActive: true })
+      .sort({ order: 1, name: 1 })
+      .lean();
 
-    return NextResponse.json({ data: content || DEFAULT_HOME_CONTENT });
+    const dynamicCategories = categories.map((category, index) => ({
+      id: category._id.toString(),
+      title: category.name,
+      href: `/category/${category.slug}`,
+      ctaLabel: "Shop Collection",
+      bgColor: CATEGORY_BG_COLORS[index % CATEGORY_BG_COLORS.length],
+      textAlign: index % 2 === 0 ? "left" : "center",
+      imageAlt: category.name,
+      image: category.image || "",
+    }));
+
+    const resolved = content || DEFAULT_HOME_CONTENT;
+    const merged = {
+      ...resolved,
+      categories: {
+        ...resolved.categories,
+        items: dynamicCategories.length ? dynamicCategories : resolved.categories.items,
+      },
+    };
+
+    return NextResponse.json({ data: merged });
   } catch (error) {
     console.error("[Home Content]", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

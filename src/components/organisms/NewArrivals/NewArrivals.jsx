@@ -1,11 +1,12 @@
 import Link from "next/link";
+import Image from "next/image";
 
 /**
  * @param {{ newArrivals: {
  *  title: string,
  *  ctaLabel: string,
  *  ctaHref: string,
- *  items: Array<{ id: number, name: string, material: string, price: string, isNew: boolean, bgColor: string, imageAlt: string }>
+ *  items: Array<{ id: number, name: string, material: string, price: string, isNew: boolean, bgColor: string, imageAlt: string, image?: string }>
  * } }} props
  */
 export function NewArrivals({ newArrivals }) {
@@ -28,9 +29,19 @@ export function NewArrivals({ newArrivals }) {
         {newArrivals.items.map((item) => (
           <div key={item.id} className="group relative pt-4 cursor-pointer">
             <div className={`relative w-full aspect-[4/5] rounded-xl overflow-hidden mb-5 ${item.bgColor}`}>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-white/40 font-serif italic text-sm">{item.imageAlt}</span>
-              </div>
+              {item.image ? (
+                <Image
+                  src={item.image}
+                  alt={item.imageAlt}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  className="object-cover"
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-white/40 font-serif italic text-sm">{item.imageAlt}</span>
+                </div>
+              )}
               {item.isNew && (
                 <span className="absolute top-4 left-4 bg-white text-[#4A3525] text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">
                   New

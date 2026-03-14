@@ -1,10 +1,11 @@
 import Link from "next/link";
+import Image from "next/image";
 
 /**
  * @param {{ categories: {
  *  title: string,
  *  subtitle: string,
- *  items: Array<{ id: number, title: string, href: string, ctaLabel: string, bgColor: string, textAlign: "left" | "center", imageAlt: string }>
+ *  items: Array<{ id: number, title: string, href: string, ctaLabel: string, bgColor: string, textAlign: "left" | "center", imageAlt: string, image?: string }>
  * } }} props
  */
 export function CategoryShowcase({ categories }) {
@@ -27,9 +28,19 @@ export function CategoryShowcase({ categories }) {
           return (
             <div key={item.id} className="relative h-[450px] rounded-2xl overflow-hidden group">
               <div className={`absolute inset-0 ${item.bgColor}`}>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-white/40 font-serif italic">{item.imageAlt}</span>
-                </div>
+                {item.image ? (
+                  <Image
+                    src={item.image}
+                    alt={item.imageAlt}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-white/40 font-serif italic">{item.imageAlt}</span>
+                  </div>
+                )}
               </div>
               <div className={`absolute inset-0 ${gradientClass}`}></div>
 

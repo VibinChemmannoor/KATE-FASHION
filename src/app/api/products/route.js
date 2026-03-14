@@ -1,6 +1,60 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { Product } from "@/lib/db/models/Product";
+import { Category } from "@/lib/db/models/Category";
+import { getCurrentUser } from "@/lib/auth/getCurrentUser";
+import { rateLimit } from "@/lib/security/rateLimit";
+import { sanitizeInput } from "@/lib/security/sanitize";
+import { validateSchema } from "@/lib/utils/validation";
+import { AUTH_RATE_LIMIT_MAX, AUTH_RATE_LIMIT_WINDOW, PRODUCTS_PAGE_SIZE } from "@/lib/utils/constants";
+
+const imageSchema = z.object({
+  url: z.string().min(1),
+  alt: z.string().min(1),
+});
+
+const productCreateSchema = z.object({
+  slug: z.string().min(3),
+  name: z.string().min(2),
+  description: z.string().min(10),
+  shortDescription: z.string().optional(),
+  price: z.number().min(1),
+  comparePrice: z.number().optional().nullable(),
+  stock: z.number().int().min(0).optional(),
+  sku: z.string().min(3),
+  brand: z.string().optional(),
+  categoryId: z.string().optional(),
+  categorySlug: z.string().optional(),
+  images: z.array(imageSchema).optional(),
+  colors: z.array(z.object({ name: z.string().min(1), swatchClass: z.string().min(1) })).optional(),
+  sizes: z.array(z.object({ size: z.string().min(1), stock: z.number().int().min(0) })).optional(),
+  tags: z.array(z.string()).optional(),
+  material: z.string().optional(),
+  gender: z.string().optional(),
+  ageGroup: z.string().optional(),
+  attributes: z.record(z.any()).optional(),
+  badge: z.string().optional(),
+  isFeatured: z.boolean().optional(),
+  materialInfo: z
+    .object({
+      description: z.string().optional(),
+      bullets: z.array(z.string()).optional(),
+    })
+    .optional(),
+  sizeChart: z
+    .array(
+      z.object({
+        size: z.string().optional(),
+        age: z.string().optional(),
+        height: z.string().optional(),
+        weight: z.string().optional(),
+      })
+    )
+    .optional(),
+});
+
+const DEFAULT_LIMIT = PRODUCTS_PAGE_SIZE;
 
 /**
  * GET /api/products — List products with filtering, sorting, pagination
@@ -9,13 +63,22 @@ import { Product } from "@/lib/db/models/Product";
  */
 export async function GET(request) {
   try {
+    const limitResult = await rateLimit(request, {
+      max: AUTH_RATE_LIMIT_MAX,
+      window: AUTH_RATE_LIMIT_WINDOW,
+    });
+    if (!limitResult.success) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
+
     await connectToDatabase();
 
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "12", 10);
+    const limit = parseInt(searchParams.get("limit") || `${DEFAULT_LIMIT}`, 10);
     const sort = searchParams.get("sort") || "newest";
     const category = searchParams.get("category");
+    const categorySlug = searchParams.get("categorySlug");
     const search = searchParams.get("search");
     const minPrice = searchParams.get("minPrice");
     const maxPrice = searchParams.get("maxPrice");
@@ -29,6 +92,15 @@ export async function GET(request) {
     const filter = { isActive: true };
 
     if (category) filter.categoryId = category;
+    if (categorySlug) {
+      const categoryBySlug = await Category.findOne({ slug: categorySlug, isActive: true })
+        .select("_id")
+        .lean();
+      if (!categoryBySlug) {
+        return NextResponse.json({ data: [], pagination: { page, limit, total: 0, totalPages: 0, hasMore: false } });
+      }
+      filter.categoryId = categoryBySlug._id;
+    }
     if (gender) filter.gender = gender;
     if (ageGroup) filter.ageGroup = ageGroup;
     if (material) filter.material = { $regex: material, $options: "i" };
@@ -41,7 +113,7 @@ export async function GET(request) {
     }
 
     if (sizes) {
-      filter.sizes = { $in: sizes.split(",") };
+      filter["sizes.size"] = { $in: sizes.split(",") };
     }
 
     if (colors) {
@@ -78,13 +150,16 @@ export async function GET(request) {
       slug: p.slug,
       name: p.name,
       description: p.description,
-      shortDescription: p.shortDescription,
+      shortDescription: p.shortDescription || p.description?.slice(0, 140) || "",
       price: p.price,
       comparePrice: p.comparePrice,
       stock: p.stock,
       sku: p.sku,
       brand: p.brand,
-      images: p.images,
+      images: (p.images || []).map((img) => ({
+        url: img.url || img.src || "",
+        alt: img.alt || p.name,
+      })),
       category: p.categoryId
         ? { id: p.categoryId._id.toString(), name: p.categoryId.name, slug: p.categoryId.slug }
         : null,
@@ -116,5 +191,74 @@ export async function GET(request) {
       { error: "Internal server error" },
       { status: 500 }
     );
+  }
+}
+
+/**
+ * POST /api/products â€” Create a product (admin only)
+ * @param {Request} request
+ * @returns {Promise<NextResponse>}
+ */
+export async function POST(request) {
+  try {
+    const limitResult = await rateLimit(request, {
+      max: AUTH_RATE_LIMIT_MAX,
+      window: AUTH_RATE_LIMIT_WINDOW,
+    });
+    if (!limitResult.success) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
+
+    const user = await getCurrentUser();
+    if (!user || user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const sanitized = sanitizeInput(body);
+    const validated = validateSchema(sanitized, productCreateSchema);
+
+    if (!validated.success) {
+      return NextResponse.json({ error: validated.errors }, { status: 400 });
+    }
+
+    await connectToDatabase();
+
+    const data = validated.data;
+    let resolvedCategoryId = data.categoryId || null;
+
+    if (!resolvedCategoryId && data.categorySlug) {
+      const category = await Category.findOne({ slug: data.categorySlug }).select("_id").lean();
+      resolvedCategoryId = category?._id?.toString() || null;
+    }
+
+    if (!resolvedCategoryId) {
+      return NextResponse.json({ error: "Category is required" }, { status: 400 });
+    }
+
+    const categoryDoc = await Category.findById(resolvedCategoryId).lean();
+    if (!categoryDoc) {
+      return NextResponse.json({ error: "Category not found" }, { status: 404 });
+    }
+
+    const created = await Product.create({
+      ...data,
+      categoryId: categoryDoc._id,
+      categorySlug: categoryDoc.slug,
+      images: (data.images || []).map((img) => ({ url: img.url, alt: img.alt })),
+    });
+
+    return NextResponse.json(
+      {
+        data: {
+          id: created._id.toString(),
+          slug: created.slug,
+        },
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("[Products POST]", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

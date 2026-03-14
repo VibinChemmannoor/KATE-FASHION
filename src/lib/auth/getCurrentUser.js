@@ -7,7 +7,7 @@ import { AUTH_COOKIE_NAME } from "@/lib/utils/constants";
 /**
  * Get the current authenticated user from session cookie.
  * Works in API routes and Server Components.
- * @returns {Promise<{ id: string, username: string, email: string, phone: string } | null>}
+ * @returns {Promise<{ id: string, username: string, email: string, phone: string, role: string } | null>}
  */
 export async function getCurrentUser() {
   try {
@@ -32,6 +32,7 @@ export async function getCurrentUser() {
       username: user.username,
       email: user.email,
       phone: user.phone,
+      role: user.role,
     };
   } catch (error) {
     console.error("[Auth] getCurrentUser error:", error);

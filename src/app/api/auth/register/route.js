@@ -16,6 +16,7 @@ import {
   AUTH_RATE_LIMIT_WINDOW,
   BABY_NAME_MAX,
   BCRYPT_SALT_ROUNDS,
+  ADMIN_EMAIL,
   MILLISECONDS_IN_SECOND,
   PHONE_MIN,
   PASSWORD_MIN,
@@ -79,11 +80,14 @@ export async function POST(request) {
     const sessionTokenHash = hashSessionToken(sessionToken);
     const sessionExpiresAt = new Date(Date.now() + AUTH_COOKIE_MAX_AGE * MILLISECONDS_IN_SECOND);
 
+    const role = email === ADMIN_EMAIL ? "ADMIN" : "USER";
+
     const user = await User.create({
       username,
       email,
       phone,
       passwordHash,
+      role,
       babyName: validated.data.babyName || "",
       babyDob: validated.data.babyDob ? new Date(validated.data.babyDob) : null,
       sessionTokenHash,
@@ -96,6 +100,7 @@ export async function POST(request) {
           id: user._id.toString(),
           username: user.username,
           email: user.email,
+          role: user.role,
         },
       },
       { status: 201 }

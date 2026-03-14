@@ -16,6 +16,7 @@ export function Header() {
   const router = useRouter();
   const itemCount = useCartStore((state) => state.itemCount);
   const { isAuthenticated, user, logout, fetchUser, setUser } = useAuthStore();
+  const isAdmin = user?.username === "VibinChemmannoor";
 
   useEffect(() => {
     fetchUser();
@@ -73,6 +74,14 @@ export function Header() {
           >
             PRODUCTS
           </Link>
+          {isAdmin && (
+            <Link
+              href="/admin/dashboard"
+              className="text-sm font-semibold tracking-wider text-[#6B4F3B] hover:text-[#EC7F13] transition-colors"
+            >
+              ADMIN
+            </Link>
+          )}
           <Link
             href="/category/boys"
             className="text-sm font-semibold tracking-wider text-[#6B4F3B] hover:text-[#EC7F13] transition-colors"
@@ -202,6 +211,15 @@ export function Header() {
               >
                 Sign In
               </button>
+            )}
+            {isAdmin && (
+              <Link
+                href="/admin/dashboard"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-sm font-semibold tracking-wider text-[#6B4F3B] hover:text-[#EC7F13] transition-colors py-2"
+              >
+                ADMIN DASHBOARD
+              </Link>
             )}
           </nav>
         </div>

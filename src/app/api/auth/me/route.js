@@ -39,6 +39,7 @@ export async function GET(request) {
         id: user._id.toString(),
         username: user.username,
         email: user.email,
+        role: user.role,
       },
     });
   } catch (error) {

@@ -5,6 +5,7 @@ import { Heart, ShoppingBag, ShieldCheck, Truck, Leaf } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
 import { useUiStore } from "@/store/uiStore";
+import { formatPrice } from "@/lib/utils/format";
 
 export function ProductInfo({ product }) {
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0]?.name || "");
@@ -65,7 +66,7 @@ export function ProductInfo({ product }) {
       <h1 className="text-4xl md:text-5xl font-serif font-bold text-[#4A3525] mb-4 leading-[1.1]">
         {product.name}
       </h1>
-      <p className="text-xl text-[#6B4F3B] font-serif mb-6">{product.price}</p>
+      <p className="text-xl text-[#6B4F3B] font-serif mb-6">{formatPrice(product.price)}</p>
 
       {/* Description */}
       <p className="text-sm font-sans text-[#6B4F3B]/80 leading-relaxed mb-10 max-w-lg">
@@ -78,7 +79,7 @@ export function ProductInfo({ product }) {
           Color: <span className="text-[#6B4F3B]/70">{selectedColor}</span>
         </p>
         <div className="flex gap-3">
-          {product.colors.map((color) => (
+          {(product.colors || []).map((color) => (
             <button
               key={color.name}
               onClick={() => setSelectedColor(color.name)}
@@ -106,7 +107,7 @@ export function ProductInfo({ product }) {
           </button>
         </div>
         <div className="grid grid-cols-4 gap-3">
-          {product.sizes.map((sizeObj) => {
+          {(product.sizes || []).map((sizeObj) => {
             const isOutOfStock = sizeObj.stock === 0;
             const isSelected = selectedSize === sizeObj.size;
 

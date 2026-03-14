@@ -15,12 +15,6 @@ export function middleware(req) {
     return NextResponse.redirect(url);
   }
 
-  if (pathname.startsWith("/admin") && sessionToken !== "admin") {
-    const url = req.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
-  }
-
   return NextResponse.next();
 }
 
