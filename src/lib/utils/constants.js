@@ -11,6 +11,8 @@ export const SESSION_TOKEN_BYTES = 32;
 
 export const AUTH_RATE_LIMIT_MAX = 10;
 export const AUTH_RATE_LIMIT_WINDOW = "1m";
+export const HOME_RATE_LIMIT_MAX = 30;
+export const HOME_RATE_LIMIT_WINDOW = "1m";
 
 export const USERNAME_MIN = 3;
 export const USERNAME_MAX = 20;
