@@ -1,9 +1,10 @@
 import "dotenv/config";
 
-import { connectToDatabase } from "../src/lib/db/mongoose.js";
 import { HomeContent } from "../src/lib/db/models/HomeContent.js";
 import { Product } from "../src/lib/db/models/Product.js";
 import { Category } from "../src/lib/db/models/Category.js";
+import mongoose from "mongoose";
+import { MONGODB_SERVER_SELECTION_TIMEOUT_MS } from "../src/lib/utils/constants.js";
 
 const HOME_CONTENT = {
   hero: {
@@ -26,7 +27,7 @@ const HOME_CONTENT = {
         id: 1,
         name: "Organic Knit Sweater",
         material: "Caramel Melange",
-        price: "₹1,850",
+        price: "Rs 1,850",
         isNew: true,
         bgColor: "bg-[#D29E74]",
         imageAlt: "New arrival 1",
@@ -36,7 +37,7 @@ const HOME_CONTENT = {
         id: 2,
         name: "Hand-knit Booties",
         material: "Cream Wool",
-        price: "₹1,250",
+        price: "Rs 1,250",
         isNew: false,
         bgColor: "bg-[#ff8a3d]",
         imageAlt: "New arrival 2",
@@ -46,7 +47,7 @@ const HOME_CONTENT = {
         id: 3,
         name: "The Welcome Set",
         material: "Essential Pack",
-        price: "₹3,150",
+        price: "Rs 3,150",
         isNew: false,
         bgColor: "bg-[#181818]",
         imageAlt: "New arrival 3",
@@ -56,7 +57,7 @@ const HOME_CONTENT = {
         id: 4,
         name: "Heirloom Wooden Blocks",
         material: "Natural Beech",
-        price: "₹1,950",
+        price: "Rs 1,950",
         isNew: false,
         bgColor: "bg-[#e7e7e7]",
         imageAlt: "New arrival 4",
@@ -195,7 +196,16 @@ const PRODUCTS = [
 ];
 
 async function seed() {
-  await connectToDatabase();
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    throw new Error("MONGODB_URI environment variable is not set");
+  }
+
+  const conn = await mongoose.connect(uri, {
+    bufferCommands: false,
+    serverSelectionTimeoutMS: MONGODB_SERVER_SELECTION_TIMEOUT_MS,
+  });
+  console.log(`[Seed] Connected to database: ${conn.connection.name}`);
 
   await HomeContent.deleteMany({});
   await HomeContent.create(HOME_CONTENT);
@@ -222,13 +232,18 @@ async function seed() {
     };
   });
 
-  await Product.insertMany(resolvedProducts);
+  const createdProducts = await Product.insertMany(resolvedProducts);
 
+  console.log(
+    `[Seed] Inserted categories: ${createdCategories.length}, products: ${createdProducts.length}`
+  );
   console.log("Seed complete");
+  await mongoose.disconnect();
   process.exit(0);
 }
 
 seed().catch((error) => {
   console.error("Seed failed", error);
+  mongoose.disconnect().catch(() => {});
   process.exit(1);
 });

@@ -28,13 +28,38 @@ async function getHomeContent() {
 }
 
 export default async function HomePage() {
-  const content = (await getHomeContent());
+  const content = await getHomeContent();
+  const fallbackContent = {
+    hero: {
+      collectionLabel: "",
+      titleLines: ["New arrivals", "for little", "moments."],
+      subtitle: "",
+      ctaLabel: "Shop Collection",
+      ctaHref: "/products",
+      primaryImageAlt: "Hero image",
+      secondaryImageAlt: "Hero image",
+      image: "",
+      hangingImage: "",
+    },
+    newArrivals: {
+      title: "New Arrivals",
+      ctaLabel: "View All",
+      ctaHref: "/products",
+      items: [],
+    },
+    categories: {
+      title: "Shop by Category",
+      subtitle: "",
+      items: [],
+    },
+  };
+  const resolvedContent = content;
 
   return (
     <div className="flex flex-col gap-8 md:gap-16 pb-16">
-      <HeroBanner hero={content.hero} />
-      <NewArrivals newArrivals={content.newArrivals} />
-      <CategoryShowcase categories={content.categories} />
+      <HeroBanner hero={resolvedContent.hero} />
+      <NewArrivals newArrivals={resolvedContent.newArrivals} />
+      <CategoryShowcase categories={resolvedContent.categories} />
     </div>
   );
 }

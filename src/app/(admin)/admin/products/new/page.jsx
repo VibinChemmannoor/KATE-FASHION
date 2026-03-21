@@ -1,8 +1,8 @@
-import { AdminProductFormPage } from "@/components/templates/AdminProductFormPage/AdminProductFormPage";
+import { redirect } from "next/navigation";
 
 /**
  * @returns {JSX.Element}
  */
 export default function AdminProductCreatePage() {
-  return <AdminProductFormPage mode="create" />;
+  redirect("/admin/products");
 }

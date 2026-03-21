@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { MONGODB_SERVER_SELECTION_TIMEOUT_MS } from "@/lib/utils/constants";
 
 let cached = global.mongoose;
 
@@ -21,6 +22,7 @@ export async function connectToDatabase() {
   if (!cached.promise) {
     cached.promise = mongoose.connect(uri, {
       bufferCommands: false,
+      serverSelectionTimeoutMS: MONGODB_SERVER_SELECTION_TIMEOUT_MS,
     });
   }
 

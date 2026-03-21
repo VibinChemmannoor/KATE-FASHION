@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { Buffer } from "buffer";
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { Product } from "@/lib/db/models/Product";
 import { Category } from "@/lib/db/models/Category";
@@ -214,8 +215,83 @@ export async function POST(request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
-    const sanitized = sanitizeInput(body);
+    let data = null;
+    const contentType = request.headers.get("content-type") || "";
+
+    if (contentType.includes("multipart/form-data")) {
+      const formData = await request.formData();
+
+      const parseJson = (key, fallback) => {
+        const value = formData.get(key);
+        if (!value) return fallback;
+        try {
+          return JSON.parse(value);
+        } catch {
+          return fallback;
+        }
+      };
+
+      const parseNumber = (key, fallback = null) => {
+        const value = formData.get(key);
+        if (value === null || value === undefined || value === "") return fallback;
+        const num = Number(value);
+        return Number.isNaN(num) ? fallback : num;
+      };
+
+      const parseBoolean = (key) => {
+        const value = formData.get(key);
+        return value === "true" || value === "1";
+      };
+
+      const files = formData.getAll("images").filter((file) => file instanceof File);
+      const existingImages = parseJson("existingImages", []);
+      const imageAlts = parseJson("imageAlts", []);
+
+      const uploadedImages = await Promise.all(
+        files.map(async (file, index) => {
+          if (!["image/png", "image/jpeg", "image/svg+xml"].includes(file.type)) {
+            throw new Error("Only PNG, JPG, or SVG images are allowed");
+          }
+          if (file.size > 5 * 1024 * 1024) {
+            throw new Error("Image size must be 5MB or less");
+          }
+          const arrayBuffer = await file.arrayBuffer();
+          const base64 = Buffer.from(arrayBuffer).toString("base64");
+          const url = `data:${file.type};base64,${base64}`;
+          return {
+            url,
+            alt: imageAlts[index] || file.name || "Product image",
+          };
+        })
+      );
+
+      data = {
+        slug: formData.get("slug") || "",
+        name: formData.get("name") || "",
+        description: formData.get("description") || "",
+        shortDescription: formData.get("shortDescription") || "",
+        price: parseNumber("price", 0),
+        comparePrice: parseNumber("comparePrice", null),
+        stock: parseNumber("stock", 0),
+        sku: formData.get("sku") || "",
+        brand: formData.get("brand") || "",
+        categorySlug: formData.get("categorySlug") || "",
+        material: formData.get("material") || "",
+        badge: formData.get("badge") || "",
+        isFeatured: parseBoolean("isFeatured"),
+        colors: parseJson("colors", []),
+        sizes: parseJson("sizes", []),
+        tags: parseJson("tags", []),
+        materialInfo: parseJson("materialInfo", {}),
+        sizeChart: parseJson("sizeChart", []),
+        images: [...existingImages, ...uploadedImages],
+      };
+    } else {
+      const body = await request.json();
+      data = sanitizeInput(body);
+    }
+
+    const sanitized = sanitizeInput(data);
     const validated = validateSchema(sanitized, productCreateSchema);
 
     if (!validated.success) {
@@ -224,11 +300,11 @@ export async function POST(request) {
 
     await connectToDatabase();
 
-    const data = validated.data;
-    let resolvedCategoryId = data.categoryId || null;
+    const validatedData = validated.data;
+    let resolvedCategoryId = validatedData.categoryId || null;
 
-    if (!resolvedCategoryId && data.categorySlug) {
-      const category = await Category.findOne({ slug: data.categorySlug }).select("_id").lean();
+    if (!resolvedCategoryId && validatedData.categorySlug) {
+      const category = await Category.findOne({ slug: validatedData.categorySlug }).select("_id").lean();
       resolvedCategoryId = category?._id?.toString() || null;
     }
 
@@ -242,10 +318,10 @@ export async function POST(request) {
     }
 
     const created = await Product.create({
-      ...data,
+      ...validatedData,
       categoryId: categoryDoc._id,
       categorySlug: categoryDoc.slug,
-      images: (data.images || []).map((img) => ({ url: img.url, alt: img.alt })),
+      images: (validatedData.images || []).map((img) => ({ url: img.url, alt: img.alt })),
     });
 
     return NextResponse.json(

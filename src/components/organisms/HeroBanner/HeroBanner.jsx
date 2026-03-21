@@ -16,14 +16,15 @@ import { ArrowRight } from "lucide-react";
  * } }} props
  */
 export function HeroBanner({ hero }) {
+  console.log('hero====',hero)
   return (
     <section className="container mx-auto px-4 md:px-8 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-auto lg:h-[600px]">
         <div className="lg:col-span-7 bg-[#E5D5C1] rounded-2xl overflow-hidden relative min-h-[400px] lg:min-h-full flex items-center justify-center">
           {hero.image ? (
             <Image
-              src={hero.image || ""}
-              alt={hero.primaryImageAlt}
+              src={hero?.image ?? ""}
+              alt={hero?.primaryImageAlt}
               fill
               sizes="(max-width: 1024px) 100vw, 60vw"
               className="object-cover"

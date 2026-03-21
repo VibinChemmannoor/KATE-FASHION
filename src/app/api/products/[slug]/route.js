@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { Buffer } from "buffer";
 
 import { connectToDatabase } from "@/lib/db/mongoose";
 import { Product } from "@/lib/db/models/Product";
@@ -178,8 +179,79 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
-    const sanitized = sanitizeInput(body);
+    let productData = null;
+    const contentType = request.headers.get("content-type") || "";
+
+    if (contentType.includes("multipart/form-data")) {
+      const formData = await request.formData();
+      const parseJson = (key, fallback) => {
+        const value = formData.get(key);
+        if (!value) return fallback;
+        try {
+          return JSON.parse(value);
+        } catch {
+          return fallback;
+        }
+      };
+      const parseNumber = (key, fallback = null) => {
+        const value = formData.get(key);
+        if (value === null || value === undefined || value === "") return fallback;
+        const num = Number(value);
+        return Number.isNaN(num) ? fallback : num;
+      };
+      const parseBoolean = (key) => {
+        const value = formData.get(key);
+        return value === "true" || value === "1";
+      };
+
+      const files = formData.getAll("images").filter((file) => file instanceof File);
+      const existingImages = parseJson("existingImages", []);
+      const imageAlts = parseJson("imageAlts", []);
+
+      const uploadedImages = await Promise.all(
+        files.map(async (file, index) => {
+          if (!["image/png", "image/jpeg", "image/svg+xml"].includes(file.type)) {
+            throw new Error("Only PNG, JPG, or SVG images are allowed");
+          }
+          if (file.size > 5 * 1024 * 1024) {
+            throw new Error("Image size must be 5MB or less");
+          }
+          const arrayBuffer = await file.arrayBuffer();
+          const base64 = Buffer.from(arrayBuffer).toString("base64");
+          const url = `data:${file.type};base64,${base64}`;
+          return {
+            url,
+            alt: imageAlts[index] || file.name || "Product image",
+          };
+        })
+      );
+
+      productData = {
+        name: formData.get("name") || "",
+        description: formData.get("description") || "",
+        shortDescription: formData.get("shortDescription") || "",
+        price: parseNumber("price", 0),
+        comparePrice: parseNumber("comparePrice", null),
+        stock: parseNumber("stock", 0),
+        sku: formData.get("sku") || "",
+        brand: formData.get("brand") || "",
+        categorySlug: formData.get("categorySlug") || "",
+        material: formData.get("material") || "",
+        badge: formData.get("badge") || "",
+        isFeatured: parseBoolean("isFeatured"),
+        colors: parseJson("colors", []),
+        sizes: parseJson("sizes", []),
+        tags: parseJson("tags", []),
+        materialInfo: parseJson("materialInfo", {}),
+        sizeChart: parseJson("sizeChart", []),
+        images: [...existingImages, ...uploadedImages],
+      };
+    } else {
+      const body = await request.json();
+      productData = sanitizeInput(body);
+    }
+
+    const sanitized = sanitizeInput(productData);
     const validated = validateSchema(sanitized, productUpdateSchema);
 
     if (!validated.success) {
@@ -189,26 +261,26 @@ export async function PUT(request, { params }) {
     await connectToDatabase();
 
     const { slug } = await params;
-    const data = validated.data;
+    const validatedData = validated.data;
 
-    if (data.categoryId || data.categorySlug) {
-      const categoryDoc = data.categoryId
-        ? await Category.findById(data.categoryId).lean()
-        : await Category.findOne({ slug: data.categorySlug }).lean();
+    if (validatedData.categoryId || validatedData.categorySlug) {
+      const categoryDoc = validatedData.categoryId
+        ? await Category.findById(validatedData.categoryId).lean()
+        : await Category.findOne({ slug: validatedData.categorySlug }).lean();
 
       if (!categoryDoc) {
         return NextResponse.json({ error: "Category not found" }, { status: 404 });
       }
 
-      data.categoryId = categoryDoc._id;
-      data.categorySlug = categoryDoc.slug;
+      validatedData.categoryId = categoryDoc._id;
+      validatedData.categorySlug = categoryDoc.slug;
     }
 
-    if (data.images) {
-      data.images = data.images.map((img) => ({ url: img.url, alt: img.alt }));
+    if (validatedData.images) {
+      validatedData.images = validatedData.images.map((img) => ({ url: img.url, alt: img.alt }));
     }
 
-    const updated = await Product.findOneAndUpdate({ slug }, data, { new: true }).lean();
+    const updated = await Product.findOneAndUpdate({ slug }, validatedData, { new: true }).lean();
     if (!updated) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }

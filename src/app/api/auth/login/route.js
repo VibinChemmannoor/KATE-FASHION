@@ -14,6 +14,7 @@ import {
   AUTH_COOKIE_MAX_AGE,
   AUTH_RATE_LIMIT_MAX,
   AUTH_RATE_LIMIT_WINDOW,
+  ADMIN_EMAIL,
   MILLISECONDS_IN_SECOND,
 } from "@/lib/utils/constants";
 
@@ -65,6 +66,10 @@ export async function POST(request) {
     const passwordMatch = await bcrypt.compare(decryptedPassword, user.passwordHash);
     if (!passwordMatch) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+    }
+
+    if (user.email === ADMIN_EMAIL && user.role !== "ADMIN") {
+      user.role = "ADMIN";
     }
 
     const sessionToken = generateSessionToken();

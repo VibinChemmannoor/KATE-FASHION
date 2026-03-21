@@ -1,9 +1,9 @@
-import { AdminProductFormPage } from "@/components/templates/AdminProductFormPage/AdminProductFormPage";
+import { redirect } from "next/navigation";
 
 /**
  * @param {{ params: { slug: string } }} props
  * @returns {JSX.Element}
  */
 export default function AdminProductEditPage({ params }) {
-  return <AdminProductFormPage mode="edit" slug={params.slug} />;
+  redirect("/admin/products");
 }

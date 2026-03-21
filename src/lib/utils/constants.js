@@ -23,3 +23,5 @@ export const BABY_NAME_MAX = 50;
 export const BCRYPT_SALT_ROUNDS = 10;
 
 export const ADMIN_EMAIL = "vibinchemmannoor@gmail.com";
+
+export const MONGODB_SERVER_SELECTION_TIMEOUT_MS = 10000;

@@ -16,7 +16,7 @@ export function Header() {
   const router = useRouter();
   const itemCount = useCartStore((state) => state.itemCount);
   const { isAuthenticated, user, logout, fetchUser, setUser } = useAuthStore();
-  const isAdmin = user?.username === "VibinChemmannoor";
+  const isAdmin = user?.role === "ADMIN";
 
   useEffect(() => {
     fetchUser();
@@ -47,7 +47,7 @@ export function Header() {
     }
     router.push("/wishlist");
   };
-
+console.log('user===',user)
   return (
     <header className="sticky top-0 z-50 w-full bg-[#FDFBF7] border-b border-[#F5F0E6] shadow-sm">
       <div className="container mx-auto px-4 md:px-8 py-5 flex items-center justify-between">
@@ -72,23 +72,23 @@ export function Header() {
             href="/products"
             className="text-sm font-semibold tracking-wider text-[#6B4F3B] hover:text-[#EC7F13] transition-colors"
           >
-            PRODUCTS
+            Collections
           </Link>
           {isAdmin && (
             <Link
               href="/admin/dashboard"
               className="text-sm font-semibold tracking-wider text-[#6B4F3B] hover:text-[#EC7F13] transition-colors"
             >
-              ADMIN
+              Admin
             </Link>
           )}
           <Link
-            href="/category/boys"
+            href="/accessories"
             className="text-sm font-semibold tracking-wider text-[#6B4F3B] hover:text-[#EC7F13] transition-colors"
           >
-            BOYS
+            Accessories
           </Link>
-          <Link
+          {/* <Link
             href="/category/girls"
             className="text-sm font-semibold tracking-wider text-[#6B4F3B] hover:text-[#EC7F13] transition-colors"
           >
@@ -99,7 +99,7 @@ export function Header() {
             className="text-sm font-semibold tracking-wider text-[#6B4F3B] hover:text-[#EC7F13] transition-colors"
           >
             NEWBORN
-          </Link>
+          </Link> */}
         </nav>
 
         <div className="flex items-center space-x-6 text-[#6B4F3B]">
@@ -177,16 +177,16 @@ export function Header() {
               onClick={() => setIsMobileMenuOpen(false)}
               className="text-sm font-semibold tracking-wider text-[#6B4F3B] hover:text-[#EC7F13] transition-colors py-2"
             >
-              PRODUCTS
+              Collections
             </Link>
             <Link
               href="/category/boys"
               onClick={() => setIsMobileMenuOpen(false)}
               className="text-sm font-semibold tracking-wider text-[#6B4F3B] hover:text-[#EC7F13] transition-colors py-2"
             >
-              BOYS
+              Accessories
             </Link>
-            <Link
+            {/* <Link
               href="/category/girls"
               onClick={() => setIsMobileMenuOpen(false)}
               className="text-sm font-semibold tracking-wider text-[#6B4F3B] hover:text-[#EC7F13] transition-colors py-2"
@@ -199,7 +199,7 @@ export function Header() {
               className="text-sm font-semibold tracking-wider text-[#6B4F3B] hover:text-[#EC7F13] transition-colors py-2"
             >
               NEWBORN
-            </Link>
+            </Link> */}
             {!isAuthenticated && (
               <button
                 type="button"
@@ -218,7 +218,7 @@ export function Header() {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="text-sm font-semibold tracking-wider text-[#6B4F3B] hover:text-[#EC7F13] transition-colors py-2"
               >
-                ADMIN DASHBOARD
+                Admin Dashboard
               </Link>
             )}
           </nav>
